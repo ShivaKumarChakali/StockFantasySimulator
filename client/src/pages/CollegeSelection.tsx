@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 
@@ -12,7 +12,7 @@ interface College {
 }
 
 export default function CollegeSelection() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [selected, setSelected] = useState<string | null>(null);
 
   const { data: colleges = [], isLoading } = useQuery<College[]>({
@@ -25,7 +25,7 @@ export default function CollegeSelection() {
 
   const handleContinue = () => {
     if (selected) {
-      navigate(`/signup?college=${selected}`);
+      setLocation(`/signup?college=${selected}`);
     }
   };
 

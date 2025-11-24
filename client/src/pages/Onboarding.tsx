@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { TrendingUp, Trophy, Users } from "lucide-react";
 
 export default function Onboarding() {
   const [step, setStep] = useState(0);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   const steps = [
     {
@@ -72,7 +72,7 @@ export default function Onboarding() {
               <Button
                 variant="ghost"
                 className="w-full"
-                onClick={() => navigate("/demo")}
+                onClick={() => setLocation("/demo")}
                 data-testid="button-try-demo"
               >
                 Try Demo
@@ -83,7 +83,7 @@ export default function Onboarding() {
               <Button
                 className="w-full"
                 size="lg"
-                onClick={() => navigate("/signup")}
+                onClick={() => setLocation("/signup")}
                 data-testid="button-join-contest"
               >
                 Join Contest
@@ -91,7 +91,7 @@ export default function Onboarding() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => navigate("/demo")}
+                onClick={() => setLocation("/demo")}
                 data-testid="button-demo-mode"
               >
                 Try Demo First

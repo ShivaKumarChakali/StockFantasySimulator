@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
@@ -24,7 +24,7 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function Signup() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [error, setError] = useState("");
 
   const { data: colleges = [] } = useQuery<College[]>({
@@ -53,7 +53,7 @@ export default function Signup() {
         throw new Error("Signup failed");
       }
 
-      navigate("/portfolio");
+      setLocation("/portfolio");
     } catch (err) {
       setError("Failed to create account. Please try again.");
     }
@@ -154,7 +154,7 @@ export default function Signup() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => navigate("/")}
+              onClick={() => setLocation("/")}
               data-testid="button-cancel"
             >
               Cancel

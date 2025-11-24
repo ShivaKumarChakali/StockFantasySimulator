@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const demoData = [
@@ -11,7 +11,7 @@ const demoData = [
 ];
 
 export default function DemoMode() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [roi] = useState(8.0);
 
   return (
@@ -72,7 +72,7 @@ export default function DemoMode() {
         <Button
           className="w-full"
           size="lg"
-          onClick={() => navigate("/signup")}
+          onClick={() => setLocation("/signup")}
           data-testid="button-create-account"
         >
           Create Account & Join
@@ -80,7 +80,7 @@ export default function DemoMode() {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => navigate("/")}
+          onClick={() => setLocation("/")}
           data-testid="button-back-home"
         >
           Back
