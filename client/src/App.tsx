@@ -10,6 +10,11 @@ import Portfolio from "@/pages/Portfolio";
 import Contests from "@/pages/Contests";
 import Profile from "@/pages/Profile";
 import Leaderboard from "@/pages/Leaderboard";
+import Onboarding from "@/pages/Onboarding";
+import CollegeSelection from "@/pages/CollegeSelection";
+import DemoMode from "@/pages/DemoMode";
+import Signup from "@/pages/Signup";
+import ReferralRanking from "@/pages/ReferralRanking";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -17,6 +22,11 @@ function Router() {
     <div className="h-screen flex flex-col bg-background">
       <main className="flex-1 overflow-hidden">
         <Switch>
+          <Route path="/onboarding" component={Onboarding} />
+          <Route path="/college" component={CollegeSelection} />
+          <Route path="/demo" component={DemoMode} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/referrals" component={ReferralRanking} />
           <Route path="/" component={Market} />
           <Route path="/portfolio" component={Portfolio} />
           <Route path="/contests" component={Contests} />

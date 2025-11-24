@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { LeaderboardEntry, type LeaderboardUser } from "@/components/LeaderboardEntry";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 const mockLeaderboard: LeaderboardUser[] = [
   { rank: 1, userId: "1", username: "StockMaster", portfolioValue: 145000, roi: 45.2 },
@@ -14,7 +17,19 @@ const mockLeaderboard: LeaderboardUser[] = [
   { rank: 8, userId: "8", username: "WealthBuilder", portfolioValue: 115000, roi: 15.8 },
 ];
 
+interface College {
+  id: string;
+  name: string;
+}
+
 export default function Leaderboard() {
+  const [activeTab, setActiveTab] = useState("global");
+  const [selectedCollege, setSelectedCollege] = useState<string>("");
+
+  const { data: colleges = [] } = useQuery<College[]>({
+    queryKey: ["/api/colleges"],
+  });
+
   return (
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border bg-card">
@@ -25,17 +40,29 @@ export default function Leaderboard() {
           </div>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          <Badge className="flex-shrink-0 px-3 py-1.5 cursor-pointer hover-elevate active-elevate-2" data-testid="badge-filter-daily">
-            Daily
-          </Badge>
-          <Badge variant="outline" className="flex-shrink-0 px-3 py-1.5 cursor-pointer hover-elevate active-elevate-2" data-testid="badge-filter-weekly">
-            Weekly
-          </Badge>
-          <Badge variant="outline" className="flex-shrink-0 px-3 py-1.5 cursor-pointer hover-elevate active-elevate-2" data-testid="badge-filter-alltime">
-            All Time
-          </Badge>
-        </div>
+        <Tabs defaultValue="global" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="global">Global</TabsTrigger>
+            <TabsTrigger value="college">College</TabsTrigger>
+            <TabsTrigger value="friends">Friends</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {activeTab === "college" && colleges.length > 0 && (
+          <select
+            value={selectedCollege}
+            onChange={(e) => setSelectedCollege(e.target.value)}
+            className="w-full mt-3 px-3 py-2 border border-input rounded-md bg-background text-sm"
+            data-testid="select-college-filter"
+          >
+            <option value="">Select your college</option>
+            {colleges.map((college) => (
+              <option key={college.id} value={college.id}>
+                {college.name}
+              </option>
+            ))}
+          </select>
+        )}
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 pb-20">

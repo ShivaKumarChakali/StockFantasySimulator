@@ -1,0 +1,236 @@
+
+A. Enhanced Feature List (Fest Edition)
+Add these to your MVP for fests:
+1. College-Based System
+Users must select their college during signup
+
+
+College-wise leaderboard
+
+
+“Top College of the Fest” ranking
+
+
+2. QR Quick Join
+QR code → opens contest page → register
+
+
+One flow for fastest on-ground conversions
+
+
+3. Guest Demo Mode
+Let users try a demo contest without signup
+
+
+Then ask them to create account to join real contest
+
+
+4. Referral Ranking
+Rank by referrals (non-monetary rewards)
+
+
+Best ambassador → exclusive certificate
+
+
+5. Fest Mode
+Special flag: Fest Mode = true
+
+
+Auto-activate special UI, leaderboard, contest timings for fest
+
+
+
+B. Competition Rules Format (For Students & Colleges)
+Use this story format for your rules page & posters.
+🏆 Estocks: Stock Market Simulation Challenge
+1. Contest Type:
+ Stock fantasy trading using virtual money.
+2. Entry Fee:
+ ₹50 – ₹100 (college can decide)
+3. Contest Duration:
+ 3 days / 5 days / 7 days (you choose)
+4. Starting Virtual Capital:
+ ₹10,00,000 virtual money
+5. ROI Calculation:
+ ROI = (Final Portfolio Value - Initial Capital) / Initial Capital × 100
+6. Rankings:
+ Based on highest ROI.
+7. Rewards:
+ Certificates + Sponsored goodies (No real money involved)
+8. Fair Play Rules:
+No real trading
+
+
+No manipulation
+
+
+One account per student
+
+
+
+C. Onboarding Flow (For New Users)
+Design this as a 90-second flow:
+Step 1: Welcome Screen
+“Welcome to Estocks – India’s First College Stock Simulation Game”
+Buttons:
+Try Demo
+
+
+Join Contest
+
+
+
+Step 2: College Selection
+Dropdown or list:
+CBIT
+
+
+VNR
+
+
+JNTU
+
+
+Vasavi
+
+
+etc.
+
+
+
+Step 3: Quick Tutorial
+3 slides:
+What is Estocks?
+ “It’s like Dream11, but for stock markets using virtual money.”
+
+
+How You Play
+ “Pick stocks → Build portfolio → Compete in contests → Rank on leaderboard”
+
+
+What You Earn
+ Certificates, rankings, campus recognition.
+
+
+
+Step 4: Portfolio Creation
+UI:
+They select 5–10 stocks
+
+
+Budget reduces live
+
+
+Confirm button
+
+
+
+Step 5: Contest Confirmation
+“Your portfolio is locked. Contest starts at 9:15 AM tomorrow.”
+Boom. Done.
+
+D. UI Layout Structure (App Screens)
+This is your clean mobile layout:
+Bottom Navigation:
+Icon
+Page
+📈
+Market
+💼
+Portfolio
+🏆
+Contests
+👤
+Profile
+
+
+Screen Details
+1. Market Screen
+Stock list with price + % change
+
+
+Filter: NIFTY50 / BANKNIFTY / IT
+
+
+Join Contest button
+
+
+
+2. Portfolio Screen
+Total virtual balance
+
+
+Current portfolio
+
+
+Sector allocation pie chart
+
+
+Locked / Editable state
+
+
+
+3. Contests Screen
+Live contests
+
+
+Upcoming contests
+
+
+Your active contests
+
+
+Join/View buttons
+
+
+
+4. Leaderboard Screen
+Tabs:
+Global
+
+
+College
+
+
+Friends
+
+
+Columns:
+ Rank | Name | College | ROI%
+
+5. Profile Screen
+Name
+
+
+College
+
+
+Total matches
+
+
+Avg ROI
+
+
+Badges earned
+
+
+
+E. Final Fest Execution Strategy
+On-ground Setup
+You should have:
+ ✅ Laptop + Mobile demo
+ ✅ QR Posters
+ ✅ 2 Volunteers
+ ✅ One big leaderboard display (TV if possible)
+
+How you attract participants on spot:
+One-liner pitch:
+“Just like Dream11, but for stock market.
+ No money risk. Just brain.
+ Top students get certified.”
+
+Conversion Strategy:
+Every participant should feel:
+“I’m not just playing. I’m building a finance profile.”
+
+
