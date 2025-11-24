@@ -103,11 +103,11 @@ export default function Home() {
             <Button
               variant="outline"
               className="h-24 flex flex-col items-center justify-center gap-2 hover-elevate"
-              onClick={() => setLocation("/market")}
+              onClick={() => setLocation("/discover")}
               data-testid="button-browse-stocks"
             >
               <TrendingUp className="w-6 h-6" />
-              <span className="text-xs">Browse Stocks</span>
+              <span className="text-xs">Browse & Portfolio</span>
             </Button>
 
             <Button
@@ -161,7 +161,11 @@ export default function Home() {
 
           <div className="grid gap-3">
             {mockTrendingStocks.map((stock) => (
-              <Card key={stock.symbol} className="p-4 hover-elevate cursor-pointer">
+              <Card 
+                key={stock.symbol} 
+                className="p-4 hover-elevate cursor-pointer"
+                onClick={() => setLocation("/discover")}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold">{stock.symbol}</p>

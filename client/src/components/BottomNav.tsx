@@ -1,11 +1,11 @@
-import { Home as HomeIcon, TrendingUp, Briefcase, Trophy, User } from "lucide-react";
+import { Home as HomeIcon, TrendingUp, Trophy, Award, User } from "lucide-react";
 import { useLocation } from "wouter";
 
 const navItems = [
   { label: "Home", icon: HomeIcon, path: "/" },
-  { label: "Market", icon: TrendingUp, path: "/market" },
-  { label: "Portfolio", icon: Briefcase, path: "/portfolio" },
+  { label: "Discover", icon: TrendingUp, path: "/discover" },
   { label: "Contests", icon: Trophy, path: "/contests" },
+  { label: "Leaderboard", icon: Award, path: "/leaderboard" },
   { label: "Profile", icon: User, path: "/profile" },
 ];
 
@@ -13,35 +13,22 @@ export function BottomNav() {
   const [location, setLocation] = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-card-border z-50">
-      <div className="h-full flex items-center justify-around px-2">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location === item.path;
-
-          return (
-            <button
-              key={item.path}
-              onClick={() => setLocation(item.path)}
-              className="flex flex-col items-center justify-center flex-1 h-full gap-1 hover-elevate active-elevate-2 rounded-md"
-              data-testid={`button-nav-${item.label.toLowerCase()}`}
-            >
-              <Icon
-                className={`h-5 w-5 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
-              />
-              <span
-                className={`text-xs font-medium ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                {item.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card h-16 flex items-center justify-around">
+      {navItems.map(({ label, icon: Icon, path }) => (
+        <button
+          key={path}
+          onClick={() => setLocation(path)}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+            location === path
+              ? "text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          data-testid={`nav-${label.toLowerCase()}`}
+        >
+          <Icon className="h-5 w-5" />
+          <span className="text-xs font-medium">{label}</span>
+        </button>
+      ))}
+    </div>
   );
 }

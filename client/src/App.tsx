@@ -7,8 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { BottomNav } from "@/components/BottomNav";
 import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
-import Market from "@/pages/Market";
-import Portfolio from "@/pages/Portfolio";
+import Discover from "@/pages/Discover";
 import Contests from "@/pages/Contests";
 import Profile from "@/pages/Profile";
 import Leaderboard from "@/pages/Leaderboard";
@@ -26,13 +25,12 @@ function Router() {
         <Switch>
           <Route path="/start" component={Landing} />
           <Route path="/" component={Home} />
-          <Route path="/market" component={Market} />
+          <Route path="/discover" component={Discover} />
           <Route path="/onboarding" component={Onboarding} />
           <Route path="/college" component={CollegeSelection} />
           <Route path="/demo" component={DemoMode} />
           <Route path="/signup" component={Signup} />
           <Route path="/referrals" component={ReferralRanking} />
-          <Route path="/portfolio" component={Portfolio} />
           <Route path="/contests" component={Contests} />
           <Route path="/profile" component={Profile} />
           <Route path="/leaderboard" component={Leaderboard} />
@@ -47,10 +45,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider>
         <TooltipProvider>
-          <Toaster />
           <Router />
+          <Toaster />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
