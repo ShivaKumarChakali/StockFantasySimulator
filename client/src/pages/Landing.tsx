@@ -42,6 +42,15 @@ export default function Landing() {
           >
             Try Demo
           </Button>
+          <Button
+            size="lg"
+            variant="ghost"
+            className="w-full"
+            onClick={() => setLocation("/")}
+            data-testid="button-go-home"
+          >
+            Go to Home
+          </Button>
         </div>
       </div>
 

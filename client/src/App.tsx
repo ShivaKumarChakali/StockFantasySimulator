@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { BottomNav } from "@/components/BottomNav";
 import Landing from "@/pages/Landing";
+import Home from "@/pages/Home";
 import Market from "@/pages/Market";
 import Portfolio from "@/pages/Portfolio";
 import Contests from "@/pages/Contests";
@@ -23,7 +24,8 @@ function Router() {
     <div className="h-screen flex flex-col bg-background">
       <main className="flex-1 overflow-hidden">
         <Switch>
-          <Route path="/" component={Landing} />
+          <Route path="/start" component={Landing} />
+          <Route path="/" component={Home} />
           <Route path="/market" component={Market} />
           <Route path="/onboarding" component={Onboarding} />
           <Route path="/college" component={CollegeSelection} />
