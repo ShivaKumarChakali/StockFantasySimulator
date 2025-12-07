@@ -13,7 +13,7 @@ export function BottomNav() {
   const [location, setLocation] = useLocation();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card h-16 flex items-center justify-around">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card h-16 pb-safe flex items-center justify-around">
       {navItems.map(({ label, icon: Icon, path }) => (
         <button
           key={path}

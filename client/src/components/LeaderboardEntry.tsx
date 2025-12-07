@@ -26,26 +26,26 @@ export function LeaderboardEntry({ user }: LeaderboardEntryProps) {
   };
 
   return (
-    <Card className="p-3" data-testid={`card-leaderboard-${user.rank}`}>
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8 h-8 flex-shrink-0">
+    <Card className="p-3 min-h-[60px] md:min-h-[70px] flex items-center" data-testid={`card-leaderboard-${user.rank}`}>
+      <div className="flex items-center gap-2 md:gap-3 w-full">
+        <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 flex-shrink-0">
           {isTopThree ? (
-            <Medal className={`h-6 w-6 ${getMedalColor(user.rank)}`} />
+            <Medal className={`h-5 w-5 md:h-6 md:w-6 ${getMedalColor(user.rank)}`} />
           ) : (
-            <span className="text-sm font-bold text-muted-foreground">
+            <span className="text-xs md:text-sm font-bold text-muted-foreground">
               {user.rank}
             </span>
           )}
         </div>
 
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarFallback className="bg-muted text-foreground font-medium">
+        <Avatar className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0">
+          <AvatarFallback className="bg-muted text-foreground font-medium text-xs md:text-sm">
             {user.username.substring(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-foreground truncate" data-testid={`text-username-${user.rank}`}>
+          <div className="font-semibold text-sm md:text-base text-foreground truncate" data-testid={`text-username-${user.rank}`}>
             {user.username}
           </div>
           <div className="text-xs text-muted-foreground tabular-nums">
@@ -53,17 +53,17 @@ export function LeaderboardEntry({ user }: LeaderboardEntryProps) {
           </div>
         </div>
 
-        <div className="text-right flex-shrink-0">
+        <div className="text-right flex-shrink-0 ml-2">
           <div
-            className={`flex items-center gap-1 text-base font-bold tabular-nums ${
+            className={`flex items-center justify-end gap-1 text-sm md:text-base font-bold tabular-nums ${
               isPositive ? "text-primary" : "text-destructive"
             }`}
             data-testid={`text-roi-${user.rank}`}
           >
             {isPositive ? (
-              <TrendingUp className="h-4 w-4" />
+              <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
             ) : (
-              <TrendingDown className="h-4 w-4" />
+              <TrendingDown className="h-3 w-3 md:h-4 md:w-4" />
             )}
             {isPositive ? "+" : ""}
             {user.roi.toFixed(2)}%

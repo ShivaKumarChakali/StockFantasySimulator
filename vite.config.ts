@@ -32,6 +32,12 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    port: 8081, // Match the Express server port
+    hmr: {
+      port: 8081, // Use same port as server (Vite middleware handles this)
+      protocol: 'ws',
+      host: 'localhost',
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],

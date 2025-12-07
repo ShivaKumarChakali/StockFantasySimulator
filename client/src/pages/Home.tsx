@@ -1,48 +1,113 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ActiveContestsSection } from "@/components/ActiveContestsSection";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
-import { TrendingUp, Trophy, Home as HomeIcon, BarChart3, Users } from "lucide-react";
-
-const mockTrendingStocks = [
-  { symbol: "META", name: "Meta Platforms", price: "$490.37", change: "+0.98%" },
-  { symbol: "AMZN", name: "Amazon.com Inc.", price: "$156.50", change: "+0.77%" },
-  { symbol: "INFY", name: "Infosys Limited", price: "$1861.+", change: "+0.65%" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { TrendingUp, Trophy, Home as HomeIcon, BarChart3, Users, Loader2 } from "lucide-react";
+import type { Stock } from "@/components/StockCard";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+
+  // Fetch user data for balance and name
+  // Use stable query key - don't include userId to prevent refetches when it changes
+  const userId = user?.uid;
+  const { data: userData } = useQuery({
+    queryKey: ["/api/users/me"], // Stable key - don't include userId
+    queryFn: async () => {
+      const response = await fetch("/api/users/me", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        if (userId) {
+          const uidResponse = await fetch(`/api/users/${userId}`, {
+            credentials: "include",
+          });
+          if (uidResponse.ok) return uidResponse.json();
+        }
+        return null;
+      }
+      return response.json();
+    },
+    enabled: !!userId, // Use stable userId instead of user object
+    // No automatic refetch - rely on WebSocket for real-time updates
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    retry: false, // Don't retry on 404
+    // Prevent fetch when query becomes enabled if data already exists
+    placeholderData: (previousData) => previousData,
+  });
+
+  // Fetch stocks (all stocks, not just top 3) - this pre-loads stocks for the entire app
+  // Note: Backend caches data for 5 minutes, and React Query shares cache across components
+  const { data: allStocks = [], isLoading } = useQuery<Stock[]>({
+    queryKey: ["/api/stocks"],
+    queryFn: async () => {
+      const response = await fetch("/api/stocks", {
+        credentials: "include",
+      });
+      if (!response.ok) return [];
+      return response.json();
+    },
+    // No automatic refetch - rely on WebSocket for real-time updates
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    refetchOnMount: false,
+    staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+    retry: false,
+  });
+
+  // Get top 3 for display on Home page
+  const stocks = allStocks.slice(0, 3);
 
   return (
-    <div className="h-full overflow-y-auto bg-background pb-24">
+    <div className="h-full overflow-y-auto bg-background pt-2 pb-32 md:pt-4">
       {/* Header Section */}
-      <div className="bg-gradient-to-b from-primary/10 to-background p-6 border-b border-border/50">
+      <div className="bg-gradient-to-b from-primary/10 to-background p-4 md:p-6 border-b border-border/50">
         <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">Welcome back, test! 👋</h1>
-            <p className="text-sm text-muted-foreground">Ready to dominate the market?</p>
+          <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+            <img 
+              src="/logo.png" 
+              alt="StockFantasy Logo" 
+              className="h-12 w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 rounded-lg object-contain flex-shrink-0"
+            />
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">
+                Welcome back, {userData?.username || user?.displayName || user?.email?.split("@")[0] || "Trader"}! 👋
+              </h1>
+              <p className="text-xs md:text-sm text-muted-foreground">Ready to dominate the market?</p>
+            </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                <span className="text-xs font-bold text-primary">₹</span>
+        <div className="grid grid-cols-2 gap-2 md:gap-3">
+          <Card className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-2">
+              <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-primary">🪙</span>
               </div>
               <span className="text-xs text-muted-foreground font-medium">Coins</span>
             </div>
-            <p className="text-xl font-bold">15,000</p>
+            <p className="text-lg md:text-xl font-bold tabular-nums">
+              {userData?.virtualBalance?.toLocaleString() || "0"}
+            </p>
           </Card>
 
-          <Card className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+          <Card className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-2">
+              <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-bold text-primary">⭐</span>
               </div>
               <span className="text-xs text-muted-foreground font-medium">Level</span>
             </div>
-            <p className="text-xl font-bold">1</p>
+            <p className="text-lg md:text-xl font-bold">1</p>
           </Card>
         </div>
 
@@ -59,84 +124,72 @@ export default function Home() {
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Your Active Contests */}
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
             <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-semibold">Your Active Contests</h2>
+              <Trophy className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
+              <h2 className="text-base md:text-lg font-semibold">Your Active Contests</h2>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/contests")}
               data-testid="link-view-all-contests"
+              className="text-xs md:text-sm"
             >
               View All →
             </Button>
           </div>
 
-          <Card className="p-8 text-center">
-            <Trophy className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-            <p className="font-semibold mb-1">No Active Contests</p>
-            <p className="text-sm text-muted-foreground mb-4">
-              Check back soon for new contests!
-            </p>
-            <Button
-              size="sm"
-              onClick={() => setLocation("/contests")}
-              data-testid="button-create-portfolio"
-            >
-              Create Portfolio
-            </Button>
-          </Card>
+          <ActiveContestsSection />
         </div>
 
         {/* Quick Actions */}
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-lg font-semibold">⚡ Quick Actions</span>
+          <div className="flex items-center gap-2 mb-3 md:mb-4">
+            <span className="text-base md:text-lg font-semibold">⚡ Quick Actions</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 md:gap-3">
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center justify-center gap-2 hover-elevate"
+              className="h-20 md:h-24 flex flex-col items-center justify-center gap-1.5 md:gap-2 hover-elevate min-h-[80px]"
               onClick={() => setLocation("/discover")}
               data-testid="button-browse-stocks"
             >
-              <TrendingUp className="w-6 h-6" />
+              <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
               <span className="text-xs">Browse & Portfolio</span>
             </Button>
 
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center justify-center gap-2 hover-elevate"
+              className="h-20 md:h-24 flex flex-col items-center justify-center gap-1.5 md:gap-2 hover-elevate min-h-[80px]"
               onClick={() => setLocation("/contests")}
               data-testid="button-join-contest"
             >
-              <Trophy className="w-6 h-6" />
+              <Trophy className="w-5 h-5 md:w-6 md:h-6" />
               <span className="text-xs">Join Contest</span>
             </Button>
 
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center justify-center gap-2 hover-elevate"
+              className="h-20 md:h-24 flex flex-col items-center justify-center gap-1.5 md:gap-2 hover-elevate min-h-[80px]"
               onClick={() => setLocation("/portfolio")}
               data-testid="button-portfolio-nav"
             >
-              <BarChart3 className="w-6 h-6" />
+              <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
               <span className="text-xs">Portfolio</span>
             </Button>
 
             <Button
               variant="outline"
-              className="h-24 flex flex-col items-center justify-center gap-2 hover-elevate"
+              className="h-20 md:h-24 flex flex-col items-center justify-center gap-1.5 md:gap-2 hover-elevate min-h-[80px]"
               onClick={() => setLocation("/leaderboard")}
               data-testid="button-leaderboard-nav"
             >
-              <Users className="w-6 h-6" />
+              <Users className="w-5 h-5 md:w-6 md:h-6" />
               <span className="text-xs">Leaderboard</span>
             </Button>
           </div>
@@ -144,51 +197,58 @@ export default function Home() {
 
         {/* Trending Stocks */}
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-semibold">Trending Stocks</h2>
+              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
+              <h2 className="text-base md:text-lg font-semibold">Trending Stocks</h2>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/market")}
               data-testid="link-view-all-stocks"
+              className="text-xs md:text-sm"
             >
               View All →
             </Button>
           </div>
 
-          <div className="grid gap-3">
-            {mockTrendingStocks.map((stock) => (
-              <Card 
-                key={stock.symbol} 
-                className="p-4 hover-elevate cursor-pointer"
-                onClick={() => setLocation("/discover")}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold">{stock.symbol}</p>
-                    <p className="text-xs text-muted-foreground">{stock.name}</p>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid gap-2 md:gap-3">
+              {stocks.map((stock) => (
+                <Card 
+                  key={stock.symbol} 
+                  className="p-3 md:p-4 hover-elevate cursor-pointer min-h-[60px] md:min-h-[70px] flex items-center"
+                  onClick={() => setLocation("/discover")}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm md:text-base truncate">{stock.symbol}</p>
+                      <p className="text-xs text-muted-foreground truncate">{stock.companyName}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-2">
+                      <p className="font-semibold text-sm md:text-base tabular-nums">₹{stock.currentPrice.toFixed(2)}</p>
+                      <p className={`text-xs ${stock.priceChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {stock.priceChange >= 0 ? '+' : ''}{stock.priceChangePercent.toFixed(2)}%
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">{stock.price}</p>
-                    <p className="text-xs text-green-600 dark:text-green-400">
-                      {stock.change}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="text-center py-4">
+        <div className="text-center py-3 md:py-4">
           <p className="text-xs text-muted-foreground">
             © 2024 TRADE UP. Fantasy trading for educational purposes.
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-1">
             Not real money. Not real stocks. Real learning.
           </p>
         </div>

@@ -11,11 +11,12 @@ export const colleges = pgTable("colleges", {
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  firebaseUid: varchar("firebase_uid").unique(),
   username: text("username").notNull().unique(),
   email: text("email"),
-  password: text("password").notNull(),
+  password: text("password"), // Optional now (for Firebase users)
   collegeId: varchar("college_id").references(() => colleges.id),
-  virtualBalance: real("virtual_balance").default(1000000),
+  virtualBalance: real("virtual_balance").default(100), // 100 coins for new users
   referralCode: text("referral_code").unique(),
   referralCount: integer("referral_count").default(0),
   festMode: boolean("fest_mode").default(false),

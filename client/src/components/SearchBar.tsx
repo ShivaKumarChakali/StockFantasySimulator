@@ -30,14 +30,14 @@ export function SearchBar({
         placeholder={placeholder}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
-        className="pl-9 pr-9 rounded-full"
+        className="pl-9 pr-9 rounded-full min-h-[44px] text-sm md:text-base"
         data-testid="input-search"
       />
       {value && (
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 md:h-9 md:w-9 min-w-[32px] min-h-[32px]"
           onClick={() => handleChange("")}
           data-testid="button-clear-search"
         >

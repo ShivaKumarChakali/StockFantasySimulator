@@ -1,0 +1,99 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NODE_ENV: production
+
+      - name: Run database migrations
+        run: |
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "⚠️  DATABASE_URL not set, skipping migrations"
+            exit 0
+          fi
+          echo "Running database migrations..."
+          npm run db:push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        continue-on-error: true
+
+      # Add your deployment steps here based on your hosting platform
+      # Examples for common platforms:
+
+      # For Railway:
+      # - name: Deploy to Railway
+      #   uses: bervProject/railway-deploy@v0.1.0
+      #   with:
+      #     railway_token: ${{ secrets.RAILWAY_TOKEN }}
+      #     service: your-service-name
+
+      # For Render:
+      # - name: Deploy to Render
+      #   run: |
+      #     curl -X POST "https://api.render.com/deploy/srv/${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}"
+
+      # For Docker:
+      # - name: Build Docker image
+      #   run: docker build -t your-image:latest .
+      # - name: Push to registry
+      #   run: docker push your-image:latest
+
+      # For SSH deployment:
+      # - name: Deploy via SSH
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.HOST }}
+      #     username: ${{ secrets.USERNAME }}
+      #     key: ${{ secrets.SSH_KEY }}
+      #     script: |
+      #       cd /path/to/app
+      #       git pull
+      #       npm ci
+      #       npm run build
+      #       pm2 restart app
+
+      - name: Deployment Summary
+        run: |
+          echo "## Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Artifacts ready in dist/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next Steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Configure deployment steps for your hosting platform" >> $GITHUB_STEP_SUMMARY
+          echo "2. Set up environment variables on your hosting platform" >> $GITHUB_STEP_SUMMARY
+          echo "3. Test the deployment" >> $GITHUB_STEP_SUMMARY
+
