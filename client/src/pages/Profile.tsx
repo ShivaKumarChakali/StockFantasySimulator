@@ -148,7 +148,7 @@ export default function Profile() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-28" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         <Card className="p-4 md:p-6 mb-4 md:mb-6">
           <div className="flex items-center gap-3 md:gap-4 mb-4">
             <Avatar className="h-16 w-16 md:h-20 md:w-20 flex-shrink-0">

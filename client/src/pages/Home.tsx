@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, Trophy, Home as HomeIcon, BarChart3, Users, Loader2 } from "lucide-react";
 import type { Stock } from "@/components/StockCard";
+import { apiUrl } from "@/lib/api";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -17,12 +18,12 @@ export default function Home() {
   const { data: userData } = useQuery({
     queryKey: ["/api/users/me"], // Stable key - don't include userId
     queryFn: async () => {
-      const response = await fetch("/api/users/me", {
+      const response = await fetch(apiUrl("/api/users/me"), {
         credentials: "include",
       });
       if (!response.ok) {
         if (userId) {
-          const uidResponse = await fetch(`/api/users/${userId}`, {
+          const uidResponse = await fetch(apiUrl(`/api/users/${userId}`), {
             credentials: "include",
           });
           if (uidResponse.ok) return uidResponse.json();
@@ -49,7 +50,8 @@ export default function Home() {
   const { data: allStocks = [], isLoading } = useQuery<Stock[]>({
     queryKey: ["/api/stocks"],
     queryFn: async () => {
-      const response = await fetch("/api/stocks", {
+      const { apiUrl } = await import("@/lib/api");
+      const response = await fetch(apiUrl("/api/stocks"), {
         credentials: "include",
       });
       if (!response.ok) return [];
@@ -67,7 +69,7 @@ export default function Home() {
   const stocks = allStocks.slice(0, 3);
 
   return (
-    <div className="h-full overflow-y-auto bg-background pt-2 pb-32 md:pt-4">
+    <div className="h-full overflow-y-auto bg-background pt-safe pb-20 md:pt-4 md:pb-32" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 0.5rem)', paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
       {/* Header Section */}
       <div className="bg-gradient-to-b from-primary/10 to-background p-4 md:p-6 border-b border-border/50">
         <div className="flex items-start justify-between mb-4">

@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, Filter, Briefcase, Plus, Loader2 } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 type TabType = "market" | "portfolio";
 
@@ -28,7 +29,7 @@ export default function Discover() {
     queryKey: ["/api/portfolios"],
     enabled: tab === "portfolio",
     queryFn: async () => {
-      const res = await fetch("/api/portfolios", {
+      const res = await fetch(apiUrl("/api/portfolios"), {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch portfolios");
@@ -48,7 +49,7 @@ export default function Discover() {
     queryKey: portfolio ? ["/api/portfolios", portfolio.id, "holdings"] : [],
     queryFn: async () => {
       if (!portfolio) return [];
-      const response = await fetch(`/api/portfolios/${portfolio.id}/holdings`, {
+      const response = await fetch(apiUrl(`/api/portfolios/${portfolio.id}/holdings`), {
         credentials: "include",
       });
       if (!response.ok) return [];
@@ -69,13 +70,13 @@ export default function Discover() {
     queryKey: searchQuery ? ["/api/stocks/search", searchQuery] : ["/api/stocks"],
     queryFn: async () => {
       if (searchQuery) {
-        const response = await fetch(`/api/stocks/search/${encodeURIComponent(searchQuery)}`, {
+        const response = await fetch(apiUrl(`/api/stocks/search/${encodeURIComponent(searchQuery)}`), {
           credentials: "include",
         });
         if (!response.ok) return [];
         return response.json();
       } else {
-        const response = await fetch("/api/stocks", {
+        const response = await fetch(apiUrl("/api/stocks"), {
           credentials: "include",
         });
         if (!response.ok) return [];
@@ -173,7 +174,7 @@ export default function Discover() {
             />
           </header>
 
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-28" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
             <div className="flex items-center gap-2 mb-3 md:mb-4">
               <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0" />
               <h2 className="text-base md:text-lg font-semibold">
@@ -218,7 +219,7 @@ export default function Discover() {
 
           {selectedStocks.size > 0 && (
             <>
-              <div className="fixed bottom-16 left-0 right-0 p-4 bg-card border-t border-border">
+              <div className="fixed left-0 right-0 p-4 bg-card border-t border-border z-40" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
                 <Button 
                   className="w-full" 
                   data-testid="button-create-portfolio"
@@ -298,7 +299,7 @@ export default function Discover() {
                 </Card>
               </header>
 
-              <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+              <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-28" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
                 <h2 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Holdings</h2>
                 <div className="flex flex-col gap-2 md:gap-3">
                   {portfolioHoldings.map((holding) => (

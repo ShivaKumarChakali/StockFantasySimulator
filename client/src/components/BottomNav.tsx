@@ -13,7 +13,7 @@ export function BottomNav() {
   const [location, setLocation] = useLocation();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card h-16 pb-safe flex items-center justify-around">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card min-h-[4rem] pb-safe flex items-center justify-around z-50 safe-area-insets" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0.5rem)' }}>
       {navItems.map(({ label, icon: Icon, path }) => (
         <button
           key={path}

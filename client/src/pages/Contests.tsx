@@ -30,7 +30,7 @@ export default function Contests() {
   }>>({
     queryKey: ["/api/contests"],
     queryFn: async () => {
-      const res = await fetch("/api/contests", {
+      const res = await fetch(apiUrl("/api/contests"), {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch contests");
@@ -51,7 +51,7 @@ export default function Contests() {
     queryKey: ["/api/users/me/contests"],
     enabled: isAuthenticated && !!user,
     queryFn: async () => {
-      const res = await fetch("/api/users/me/contests", {
+      const res = await fetch(apiUrl("/api/users/me/contests"), {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch contests");
@@ -69,21 +69,21 @@ export default function Contests() {
   }>({
     queryKey: user ? ["/api/users", user.uid] : [],
     enabled: isAuthenticated && !!user,
-    queryFn: async () => {
-      if (!user) return { virtualBalance: 0 };
-      const res = await fetch(`/api/users/${user.uid}`, {
-        credentials: "include",
-      });
-      if (!res.ok) {
-        // Fallback to session endpoint
-        const sessionRes = await fetch("/api/users/me", {
+      queryFn: async () => {
+        if (!user) return { virtualBalance: 0 };
+        const res = await fetch(apiUrl(`/api/users/${user.uid}`), {
           credentials: "include",
         });
-        if (!sessionRes.ok) return { virtualBalance: 0 };
-        return sessionRes.json();
-      }
-      return res.json();
-    },
+        if (!res.ok) {
+          // Fallback to session endpoint
+          const sessionRes = await fetch(apiUrl("/api/users/me"), {
+            credentials: "include",
+          });
+          if (!sessionRes.ok) return { virtualBalance: 0 };
+          return sessionRes.json();
+        }
+        return res.json();
+      },
     refetchOnWindowFocus: false,
     refetchInterval: false,
     staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
@@ -165,7 +165,7 @@ export default function Contests() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-28" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin text-primary" />
@@ -198,7 +198,7 @@ export default function Contests() {
         />
       )}
 
-      <div className="fixed bottom-16 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border">
+      <div className="fixed left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-40" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         <Button 
           variant="outline" 
           className="w-full min-h-[44px]" 

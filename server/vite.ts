@@ -77,6 +77,10 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
+  // In production, the built client is in dist/public (from vite build)
+  // The server code is in dist/ (from esbuild)
+  // When running from dist/index.js, import.meta.dirname is dist/
+  // So dist/public is at dist/public relative to dist/
   const distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {

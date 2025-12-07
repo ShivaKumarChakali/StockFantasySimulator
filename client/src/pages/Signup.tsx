@@ -69,7 +69,7 @@ export default function Signup() {
         <p className="text-xs md:text-sm text-muted-foreground mt-1">Join the stock trading challenge</p>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-28" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md mx-auto">
             {error && (

@@ -23,7 +23,7 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <main className="flex-1 overflow-hidden">
         <Switch>
           <Route path="/start" component={Landing} />

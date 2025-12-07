@@ -1,0 +1,44 @@
+# Render ignore file - files to exclude from deployment
+
+# Development files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts (will be regenerated)
+dist/
+build/
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+tests/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation (optional - can include if you want)
+# *.md
+
+# Android/iOS native projects
+android/
+ios/
+
+# Git
+.git/
+.gitignore
+
+# CI/CD (optional - can include)
+# .github/
+

@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Loader2 } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 export function ActiveContestsSection() {
   const { isAuthenticated, user } = useAuth();
@@ -27,7 +28,7 @@ export function ActiveContestsSection() {
     queryKey: ["/api/users/me/contests"], // Stable key - don't include userId
     enabled: isAuthenticated && !!userId, // Use stable userId
     queryFn: async () => {
-      const res = await fetch("/api/users/me/contests", {
+      const res = await fetch(apiUrl("/api/users/me/contests"), {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch contests");

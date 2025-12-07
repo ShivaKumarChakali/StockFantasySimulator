@@ -176,7 +176,7 @@ export default function Leaderboard() {
         )}
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-28" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin text-primary" />
@@ -196,7 +196,7 @@ export default function Leaderboard() {
         )}
       </div>
 
-      <div className="fixed bottom-16 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border">
+      <div className="fixed left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-40" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         <Button variant="outline" className="w-full min-h-[44px]" data-testid="button-view-my-rank">
           View My Rank
         </Button>

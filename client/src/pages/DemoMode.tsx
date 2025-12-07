@@ -68,7 +68,7 @@ export default function DemoMode() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-border bg-background space-y-2">
+      <div className="fixed left-0 right-0 p-4 border-t border-border bg-background space-y-2 z-40 pb-safe" style={{ bottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <Button
           className="w-full"
           size="lg"

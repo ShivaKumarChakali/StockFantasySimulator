@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { apiUrl } from "@/lib/api";
 
 interface JoinContestDialogProps {
   open: boolean;
@@ -35,7 +36,7 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
     queryKey: ["/api/portfolios"],
     enabled: open && isAuthenticated,
     queryFn: async () => {
-      const res = await fetch("/api/portfolios", {
+      const res = await fetch(apiUrl("/api/portfolios"), {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch portfolios");
@@ -52,13 +53,13 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
     queryFn: async () => {
       if (!user) return null;
       // Try to get user by Firebase UID first, then by session
-      const response = await fetch(`/api/users/${user.uid}`, {
+      const response = await fetch(apiUrl(`/api/users/${user.uid}`), {
         credentials: "include",
       });
       if (response.ok) return response.json();
       
       // Fallback: get current user from session
-      const sessionResponse = await fetch("/api/users/me", {
+      const sessionResponse = await fetch(apiUrl("/api/users/me"), {
         credentials: "include",
       });
       if (sessionResponse.ok) return sessionResponse.json();
@@ -69,7 +70,7 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
 
   const joinContestMutation = useMutation({
     mutationFn: async ({ contestId, portfolioId }: { contestId: string; portfolioId: string }) => {
-      const response = await fetch(`/api/contests/${contestId}/join`, {
+      const response = await fetch(apiUrl(`/api/contests/${contestId}/join`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useLocation } from "wouter";
+import { apiUrl } from "@/lib/api";
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const handleRedirectSignIn = async () => {
             try {
               const token = await result.user.getIdToken();
-              const response = await fetch("/api/auth/firebase", {
+              const response = await fetch(apiUrl("/api/auth/firebase"), {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -85,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = await userCredential.user.getIdToken();
 
       // Create user record in backend
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch(apiUrl("/api/auth/signup"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = await userCredential.user.getIdToken();
 
       // Verify with backend
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -198,7 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await signOut(auth);
-      await fetch("/api/auth/logout", {
+      await fetch(apiUrl("/api/auth/logout"), {
         method: "POST",
         credentials: "include",
       });

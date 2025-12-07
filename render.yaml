@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: stock-fantasy-simulator
+    env: node
+    plan: starter # or free, starter, standard, pro
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false # Set this in Render dashboard
+      - key: FIREBASE_PROJECT_ID
+        sync: false # Set this in Render dashboard
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false # Set this in Render dashboard
+      - key: CORS_ORIGIN
+        sync: false # Set to your Render URL, e.g., https://stock-fantasy-simulator.onrender.com
+
