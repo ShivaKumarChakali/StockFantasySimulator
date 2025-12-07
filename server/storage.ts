@@ -131,7 +131,7 @@ export class MemStorage implements IStorage {
     let college = Array.from(this.colleges.values()).find((c) => c.name === name);
     if (!college) {
       const id = randomUUID();
-      college = { id, name, city };
+      college = { id, name, city: city || null };
       this.colleges.set(id, college);
     }
     return college;
@@ -233,8 +233,8 @@ export class MemStorage implements IStorage {
       contestId,
       portfolioId,
       joinedAt: new Date(),
-      rank: undefined,
-      finalRoi: undefined,
+      rank: null,
+      finalRoi: null,
     };
     this.userContests.set(id, userContest);
     return userContest;
@@ -308,27 +308,29 @@ export { PostgresStorage } from "./pg-storage";
 // Use PostgreSQL storage if DATABASE_URL is set, otherwise fall back to MemStorage
 const usePostgres = !!process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== "";
 
-let storage: IStorage;
+let storage: IStorage = new MemStorage(); // Initialize with default
 
-// Initialize storage synchronously (will be set in async function)
-if (usePostgres) {
-  // Try to use PostgreSQL, but don't fail if db is not available
-  try {
-    const { db } = await import("./db");
-    if (db) {
-      const { PostgresStorage } = await import("./pg-storage");
-      storage = new PostgresStorage();
-      console.log("✅ Using PostgreSQL database");
-    } else {
-      throw new Error("Database connection not available");
+// Initialize storage (using async IIFE for top-level await)
+(async () => {
+  if (usePostgres) {
+    // Try to use PostgreSQL, but don't fail if db is not available
+    try {
+      const { db } = await import("./db");
+      if (db) {
+        const { PostgresStorage } = await import("./pg-storage");
+        storage = new PostgresStorage();
+        console.log("✅ Using PostgreSQL database");
+      } else {
+        throw new Error("Database connection not available");
+      }
+    } catch (error) {
+      console.error("Failed to initialize PostgreSQL storage, falling back to MemStorage:", error);
+      storage = new MemStorage();
     }
-  } catch (error) {
-    console.error("Failed to initialize PostgreSQL storage, falling back to MemStorage:", error);
+  } else {
     storage = new MemStorage();
+    console.log("⚠️  Using in-memory storage (set DATABASE_URL to use PostgreSQL)");
   }
-} else {
-  storage = new MemStorage();
-  console.log("⚠️  Using in-memory storage (set DATABASE_URL to use PostgreSQL)");
-}
+})();
 
 export { storage };

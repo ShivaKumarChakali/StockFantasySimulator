@@ -154,7 +154,8 @@ export async function seedContests() {
           let totalInvested = 0;
           for (const stock of selectedStocks) {
             const investment = stock.buyPrice * stock.quantity;
-            if (totalInvested + investment <= contest.startingCapital * 0.9) {
+            const startingCapital = contest.startingCapital || 1000000;
+            if (totalInvested + investment <= startingCapital * 0.9) {
               // Add some randomness to buy prices (±5%)
               const priceVariation = stock.buyPrice * (0.95 + Math.random() * 0.1);
               
@@ -175,7 +176,8 @@ export async function seedContests() {
 
           // Set random ROI between -5% and +15% for variety
           const roi = (Math.random() * 20 - 5); // -5 to +15
-          const newTotalValue = contest.startingCapital * (1 + roi / 100);
+          const startingCapital = contest.startingCapital || 1000000;
+          const newTotalValue = startingCapital * (1 + roi / 100);
           await storage.updatePortfolioROI(portfolio.id, roi);
           await storage.updatePortfolioTotalValue(portfolio.id, newTotalValue);
         } catch (error) {

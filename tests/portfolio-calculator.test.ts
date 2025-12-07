@@ -122,7 +122,7 @@ describe('Portfolio Calculator', () => {
   });
 
   it('should return null if portfolio not found', async () => {
-    vi.mocked(storage.getPortfolio).mockResolvedValue(null);
+    vi.mocked(storage.getPortfolio).mockResolvedValue(undefined);
 
     const result = await calculatePortfolioROI('non-existent');
     expect(result).toBeNull();

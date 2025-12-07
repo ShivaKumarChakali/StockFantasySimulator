@@ -310,12 +310,19 @@ export class PostgresStorage implements IStorage {
   }
 
   async getTopReferrers(limit: number = 10): Promise<(User & { referralCount: number })[]> {
-    return await this.getDb()
+    const results = await this.getDb()
       .select()
       .from(users)
       .where(sql`${users.referralCount} > 0`)
       .orderBy(desc(users.referralCount))
       .limit(limit);
+    
+    // Filter out null referralCount and ensure type safety
+    return results
+      .filter((user): user is User & { referralCount: number } => 
+        user.referralCount !== null && user.referralCount !== undefined
+      )
+      .map(user => ({ ...user, referralCount: user.referralCount! }));
   }
 }
 

@@ -76,7 +76,7 @@ async function distributePrizesForContest(contestId: string): Promise<void> {
   for (const entry of leaderboard) {
     if (entry.portfolioId) {
       const portfolio = await storage.getPortfolio(entry.portfolioId);
-      const finalRoi = portfolio?.roi || entry.roi || 0;
+      const finalRoi = portfolio?.roi || entry.finalRoi || 0;
       // Save final ROI to userContest record
       await storage.updateUserContestFinalRoi(entry.id, finalRoi);
     }
@@ -89,7 +89,7 @@ async function distributePrizesForContest(contestId: string): Promise<void> {
 
     // Get final ROI (from portfolio or saved value)
     const portfolio = entry.portfolioId ? await storage.getPortfolio(entry.portfolioId) : null;
-    const finalRoi = portfolio?.roi || entry.roi || 0;
+    const finalRoi = portfolio?.roi || entry.finalRoi || 0;
 
     // Calculate prize amount based on rank
     const prizePercentage = PRIZE_DISTRIBUTION[i]?.percentage || 0;

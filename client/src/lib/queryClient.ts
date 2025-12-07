@@ -53,7 +53,7 @@ export const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000, // Keep unused queries for 10 minutes
       retry: false,
       // Use cached data as placeholder to prevent refetch when enabled changes
-      placeholderData: (previousData) => previousData,
+      placeholderData: (previousData: unknown) => previousData as unknown,
       // Prevent refetch when query key changes but data exists
       structuralSharing: true,
     },

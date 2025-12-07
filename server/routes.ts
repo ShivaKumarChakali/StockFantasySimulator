@@ -61,8 +61,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.createUser({
           firebaseUid,
           username: finalUsername,
-          email: email || undefined,
-          password: undefined, // No password for Firebase users
+          email: email,
+          password: "", // Empty password for Firebase users (will be ignored)
           collegeId: undefined,
         });
       }
@@ -106,9 +106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const user = await storage.createUser({
           firebaseUid,
           username,
-          email,
-          password: undefined,
-          collegeId,
+          email: email,
+          password: "", // Empty password for Firebase users (will be ignored)
+          collegeId: collegeId,
         });
 
         (req.session as any).userId = user.id;

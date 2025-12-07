@@ -62,9 +62,19 @@ export default function Profile() {
   });
 
   // Fetch user portfolios for ROI calculation
-  const { data: portfolios = [] } = useQuery({
+  const { data: portfolios = [] } = useQuery<Array<{
+    id: string;
+    roi: number | null;
+  }>>({
     queryKey: ["/api/portfolios"], // Stable key - don't include userId
     enabled: !!userId,
+    queryFn: async () => {
+      const res = await fetch("/api/portfolios", {
+        credentials: "include",
+      });
+      if (!res.ok) return [];
+      return res.json();
+    },
     refetchOnWindowFocus: false,
     refetchInterval: false,
     refetchOnMount: false,
@@ -84,7 +94,7 @@ export default function Profile() {
   // Calculate statistics
   const contestsPlayed = userContests.length;
   const totalROI = portfolios.length > 0
-    ? portfolios.reduce((sum: number, p: any) => sum + (p.roi || 0), 0) / portfolios.length
+    ? portfolios.reduce((sum: number, p) => sum + (p.roi || 0), 0) / portfolios.length
     : 0;
   
   // Get best rank from contests

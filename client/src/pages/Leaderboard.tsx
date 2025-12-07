@@ -29,8 +29,18 @@ export default function Leaderboard() {
   });
 
   // Fetch contests for filtering
-  const { data: contests = [] } = useQuery({
+  const { data: contests = [] } = useQuery<Array<{
+    id: string;
+    name: string;
+  }>>({
     queryKey: ["/api/contests"],
+    queryFn: async () => {
+      const res = await fetch("/api/contests", {
+        credentials: "include",
+      });
+      if (!res.ok) return [];
+      return res.json();
+    },
     refetchOnWindowFocus: false,
     refetchInterval: false,
     staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
@@ -155,7 +165,7 @@ export default function Leaderboard() {
                 className="w-full px-3 py-2 min-h-[44px] border border-input rounded-md bg-background text-sm"
               >
                 <option value="">All Contests</option>
-                {contests.map((contest: any) => (
+                {contests.map((contest) => (
                   <option key={contest.id} value={contest.id}>
                     {contest.name}
                   </option>
@@ -179,7 +189,7 @@ export default function Leaderboard() {
           </div>
         ) : (
           <div className="flex flex-col gap-2 md:gap-3">
-            {leaderboard.map((user) => (
+            {leaderboard.map((user: { userId: string; username: string; roi: number; portfolioValue: number; rank: number }) => (
               <LeaderboardEntry key={user.userId} user={user} />
             ))}
           </div>

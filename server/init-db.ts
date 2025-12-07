@@ -8,6 +8,11 @@ import { seedContests } from "./seed-contests";
  */
 export async function initializeDatabase() {
   try {
+    if (!db) {
+      console.log("⚠️  Database not available, skipping initialization");
+      return;
+    }
+    
     // Check if colleges already exist
     const existingColleges = await db.select().from(colleges).limit(1);
     

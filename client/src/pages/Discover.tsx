@@ -21,10 +21,19 @@ export default function Discover() {
   const { user } = useAuth();
 
   // Fetch user portfolios
-  const { data: portfolios = [] } = useQuery({
+  const { data: portfolios = [] } = useQuery<Array<{
+    id: string;
+    name: string;
+  }>>({
     queryKey: ["/api/portfolios"],
     enabled: tab === "portfolio",
-    credentials: "include",
+    queryFn: async () => {
+      const res = await fetch("/api/portfolios", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch portfolios");
+      return res.json();
+    },
     refetchOnWindowFocus: false,
     refetchInterval: false,
     staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes

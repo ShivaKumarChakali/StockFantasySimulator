@@ -26,14 +26,28 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
   const queryClient = useQueryClient();
 
   // Fetch user's portfolios
-  const { data: portfolios = [], isLoading: portfoliosLoading } = useQuery({
+  const { data: portfolios = [], isLoading: portfoliosLoading } = useQuery<Array<{
+    id: string;
+    name: string;
+    totalValue: number;
+    roi: number;
+  }>>({
     queryKey: ["/api/portfolios"],
     enabled: open && isAuthenticated,
-    credentials: "include",
+    queryFn: async () => {
+      const res = await fetch("/api/portfolios", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch portfolios");
+      return res.json();
+    },
   });
 
   // Fetch user data for balance check
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{
+    id: string;
+    virtualBalance: number;
+  } | null>({
     queryKey: user ? ["/api/users", user.uid] : [],
     queryFn: async () => {
       if (!user) return null;
@@ -51,7 +65,6 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
       return null;
     },
     enabled: open && isAuthenticated && !!user,
-    credentials: "include",
   });
 
   const joinContestMutation = useMutation({
@@ -165,7 +178,7 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
               <div>
                 <label className="text-xs md:text-sm font-medium mb-2 block">Select Portfolio</label>
                 <div className="space-y-2">
-                  {portfolios.map((portfolio: any) => (
+                  {portfolios.map((portfolio) => (
                     <button
                       key={portfolio.id}
                       onClick={() => setSelectedPortfolioId(portfolio.id)}

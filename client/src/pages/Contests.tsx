@@ -15,8 +15,27 @@ export default function Contests() {
   const { isAuthenticated, user } = useAuth();
 
   // Fetch contests
-  const { data: contests = [], isLoading } = useQuery({
+  const { data: contests = [], isLoading } = useQuery<Array<{
+    id: string;
+    name: string;
+    entryFee: number;
+    prizePool?: number;
+    participants?: number;
+    timeRemaining?: string;
+    festMode?: boolean;
+    featured?: boolean;
+    closingSoon?: boolean;
+    status?: string;
+    endDate: string;
+  }>>({
     queryKey: ["/api/contests"],
+    queryFn: async () => {
+      const res = await fetch("/api/contests", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch contests");
+      return res.json();
+    },
     // No automatic refetch - rely on WebSocket for real-time updates
     refetchOnWindowFocus: false,
     refetchInterval: false,
@@ -25,10 +44,19 @@ export default function Contests() {
   });
 
   // Fetch user's contests to check participation
-  const { data: userContests = [] } = useQuery({
+  const { data: userContests = [] } = useQuery<Array<{
+    contestId: string;
+    contest?: { id: string };
+  }>>({
     queryKey: ["/api/users/me/contests"],
     enabled: isAuthenticated && !!user,
-    credentials: "include",
+    queryFn: async () => {
+      const res = await fetch("/api/users/me/contests", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch contests");
+      return res.json();
+    },
     refetchOnWindowFocus: false,
     refetchInterval: false,
     staleTime: 2 * 60 * 1000,
@@ -36,10 +64,26 @@ export default function Contests() {
   });
 
   // Fetch user balance
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{
+    virtualBalance: number;
+  }>({
     queryKey: user ? ["/api/users", user.uid] : [],
     enabled: isAuthenticated && !!user,
-    credentials: "include",
+    queryFn: async () => {
+      if (!user) return { virtualBalance: 0 };
+      const res = await fetch(`/api/users/${user.uid}`, {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        // Fallback to session endpoint
+        const sessionRes = await fetch("/api/users/me", {
+          credentials: "include",
+        });
+        if (!sessionRes.ok) return { virtualBalance: 0 };
+        return sessionRes.json();
+      }
+      return res.json();
+    },
     refetchOnWindowFocus: false,
     refetchInterval: false,
     staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
@@ -53,11 +97,11 @@ export default function Contests() {
 
   // Create a set of contest IDs the user has participated in
   const participatedContestIds = new Set(
-    userContests.map((uc: any) => uc.contestId || uc.contest?.id)
+    userContests.map((uc) => uc.contestId || uc.contest?.id)
   );
 
   // Filter contests - exclude ended contests by default (unless showing "all")
-  const filteredContests = contests.filter((contest: any) => {
+  const filteredContests = contests.filter((contest) => {
     // Filter by status
     if (filter === "featured") return contest.festMode || contest.featured;
     if (filter === "closing") return contest.closingSoon;

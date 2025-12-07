@@ -10,10 +10,29 @@ export function ActiveContestsSection() {
   const [, setLocation] = useLocation();
 
   const userId = user?.uid;
-  const { data: userContests = [], isLoading } = useQuery({
+  const { data: userContests = [], isLoading } = useQuery<Array<{
+    id: string;
+    contestId: string;
+    portfolioId: string | null;
+    userId: string;
+    contest?: {
+      id: string;
+      name: string;
+      startDate: string;
+      endDate: string;
+    };
+    finalRoi: number | null;
+    rank: number | null;
+  }>>({
     queryKey: ["/api/users/me/contests"], // Stable key - don't include userId
     enabled: isAuthenticated && !!userId, // Use stable userId
-    credentials: "include",
+    queryFn: async () => {
+      const res = await fetch("/api/users/me/contests", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch contests");
+      return res.json();
+    },
     // No automatic refetch - rely on WebSocket for real-time updates
     refetchOnWindowFocus: false,
     refetchInterval: false,
@@ -27,7 +46,7 @@ export function ActiveContestsSection() {
   });
 
   // Filter active contests (live or upcoming)
-  const activeContests = userContests.filter((uc: any) => {
+  const activeContests = userContests.filter((uc) => {
     const contest = uc.contest;
     if (!contest) return false;
     const now = new Date();
