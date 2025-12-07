@@ -32,10 +32,15 @@ export async function initializeDatabase() {
     }
 
     // Seed daily contests and dummy leaderboard data
-    try {
-      await seedContests();
-    } catch (error) {
-      console.warn("⚠️  Could not seed contests (this is okay if they already exist):", error);
+    // Skip seeding in production to avoid errors - daily contest scheduler will handle it
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        await seedContests();
+      } catch (error) {
+        console.warn("⚠️  Could not seed contests (this is okay if they already exist):", error);
+      }
+    } else {
+      console.log("ℹ️  Skipping contest seeding in production (daily scheduler will handle it)");
     }
   } catch (error) {
     console.error("❌ Failed to initialize database:", error);

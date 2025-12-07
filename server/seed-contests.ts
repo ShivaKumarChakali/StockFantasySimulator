@@ -41,40 +41,94 @@ export async function seedContests() {
     const { startDate, endDate } = getTodayMarketTimes();
     const allContests = await storage.getAllContests();
     const todayContests = allContests.filter(
-      (c) => new Date(c.startDate).getTime() === startDate.getTime()
+      (c) => {
+        const contestStart = new Date(c.startDate);
+        const contestStartTime = contestStart.getTime();
+        const todayStartTime = startDate.getTime();
+        // Allow 1 hour tolerance for timezone/rounding differences
+        return Math.abs(contestStartTime - todayStartTime) < 60 * 60 * 1000;
+      }
     );
 
+    // Create or get 2 daily contests
+    let contest1, contest2;
+    
+    // Create or get 2 daily contests
+    let contest1, contest2;
+    
     if (todayContests.length >= 2) {
-      console.log("✅ Daily contests already exist");
+      console.log(`✅ Daily contests already exist (found ${todayContests.length} contests)`);
+      // Use existing contests for seeding
+      contest1 = todayContests[0];
+      contest2 = todayContests[1];
+      console.log(`✅ Using existing contests: ${contest1.name}, ${contest2.name}`);
+    } else {
+      // Create 2 daily contests
+      try {
+      contest1 = await storage.createContest({
+        name: "Daily Stock Challenge - Morning",
+        description: "Join the morning trading session! Show your skills and compete for the top spot.",
+        entryFee: 100,
+        startingCapital: 1000000,
+        duration: 1, // 1 day
+        startDate,
+        endDate,
+        festMode: false,
+        status: "live",
+      });
+      console.log(`✅ Created contest: ${contest1.name} (ID: ${contest1.id})`);
+    } catch (error) {
+      console.error("❌ Failed to create contest 1:", error);
+      // Try to find existing contest
+      const allContests = await storage.getAllContests();
+      contest1 = allContests.find(c => c.name === "Daily Stock Challenge - Morning" && new Date(c.startDate).getTime() === startDate.getTime());
+      if (!contest1) {
+        console.error("❌ Could not create or find contest 1, skipping seeding");
+        return;
+      }
+      console.log(`✅ Using existing contest: ${contest1.name} (ID: ${contest1.id})`);
+    }
+
+    try {
+      contest2 = await storage.createContest({
+        name: "Daily Stock Challenge - Afternoon",
+        description: "Afternoon trading session. Make the best moves and climb the leaderboard!",
+        entryFee: 50,
+        startingCapital: 1000000,
+        duration: 1,
+        startDate,
+        endDate,
+        festMode: false,
+        status: "live",
+      });
+      console.log(`✅ Created contest: ${contest2.name} (ID: ${contest2.id})`);
+    } catch (error) {
+      console.error("❌ Failed to create contest 2:", error);
+      // Try to find existing contest
+      const allContests = await storage.getAllContests();
+      contest2 = allContests.find(c => c.name === "Daily Stock Challenge - Afternoon" && new Date(c.startDate).getTime() === startDate.getTime());
+      if (!contest2) {
+        console.error("❌ Could not create or find contest 2, skipping seeding");
+        return;
+      }
+      console.log(`✅ Using existing contest: ${contest2.name} (ID: ${contest2.id})`);
+    }
+
+    // Verify contests exist in database before proceeding
+    const verifyContest1 = await storage.getContest(contest1.id);
+    const verifyContest2 = await storage.getContest(contest2.id);
+    
+    if (!verifyContest1) {
+      console.error(`❌ Contest 1 (${contest1.id}) not found in database after creation`);
+      return;
+    }
+    if (!verifyContest2) {
+      console.error(`❌ Contest 2 (${contest2.id}) not found in database after creation`);
       return;
     }
 
-    // Create 2 daily contests
-    const contest1 = await storage.createContest({
-      name: "Daily Stock Challenge - Morning",
-      description: "Join the morning trading session! Show your skills and compete for the top spot.",
-      entryFee: 100,
-      startingCapital: 1000000,
-      duration: 1, // 1 day
-      startDate,
-      endDate,
-      festMode: false,
-      status: "live",
-    });
-
-    const contest2 = await storage.createContest({
-      name: "Daily Stock Challenge - Afternoon",
-      description: "Afternoon trading session. Make the best moves and climb the leaderboard!",
-      entryFee: 50,
-      startingCapital: 1000000,
-      duration: 1,
-      startDate,
-      endDate,
-      festMode: false,
-      status: "live",
-    });
-
-    console.log(`✅ Created contests: ${contest1.name}, ${contest2.name}`);
+    console.log(`✅ Verified contests exist in database: ${contest1.name}, ${contest2.name}`);
+    } // End of else block for creating contests
 
     // Create dummy users if they don't exist
     const dummyUsers = [
@@ -168,6 +222,13 @@ export async function seedContests() {
               });
               totalInvested += investment;
             }
+          }
+
+          // Verify contest exists before joining
+          const verifyContest = await storage.getContest(contest.id);
+          if (!verifyContest) {
+            console.error(`❌ Contest ${contest.id} not found when trying to join for user ${user.username}`);
+            continue;
           }
 
           // Join contest
