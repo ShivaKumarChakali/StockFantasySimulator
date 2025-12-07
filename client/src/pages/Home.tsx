@@ -50,7 +50,6 @@ export default function Home() {
   const { data: allStocks = [], isLoading } = useQuery<Stock[]>({
     queryKey: ["/api/stocks"],
     queryFn: async () => {
-      const { apiUrl } = await import("@/lib/api");
       const response = await fetch(apiUrl("/api/stocks"), {
         credentials: "include",
       });

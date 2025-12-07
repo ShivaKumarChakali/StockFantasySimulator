@@ -53,9 +53,6 @@ export async function seedContests() {
     // Create or get 2 daily contests
     let contest1, contest2;
     
-    // Create or get 2 daily contests
-    let contest1, contest2;
-    
     if (todayContests.length >= 2) {
       console.log(`✅ Daily contests already exist (found ${todayContests.length} contests)`);
       // Use existing contests for seeding
