@@ -7,3 +7,11 @@ vite.config.ts.*
 .env
 .env.local
 .env.*.local
+
+# Capacitor
+android/local.properties
+android/keystore.properties
+*.keystore
+*.jks
+ios/
+.capacitor/

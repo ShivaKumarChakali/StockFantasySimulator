@@ -30,7 +30,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Capacitor requires relative paths
+    assetsDir: "assets",
   },
+  // Base path for Capacitor
+  base: "./",
   server: {
     port: 8081, // Match the Express server port
     hmr: {

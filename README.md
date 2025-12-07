@@ -2,6 +2,32 @@
 
 A gamified stock trading learning platform where users create virtual portfolios, compete in daily contests, and master stock trading in a risk-free environment.
 
+## 📱 Mobile App
+
+Build native Android APK using Capacitor - **No Android Studio needed!**
+
+### 🚀 Quick Start (GitHub Actions - Recommended)
+
+1. **Push code to GitHub**
+2. **Go to Actions tab** → **Build Android APK** → **Run workflow**
+3. **Download APK** from Artifacts (takes ~5-10 minutes)
+
+See [BUILD_APK_WITHOUT_STUDIO.md](./BUILD_APK_WITHOUT_STUDIO.md) for all methods.
+
+### Alternative: Local Build
+
+```bash
+# Build and open in Android Studio (if installed)
+npm run cap:build:android
+
+# Or step by step:
+npm run build:mobile    # Build web app
+npm run cap:sync        # Sync to Android
+npm run cap:open:android # Open in Android Studio
+```
+
+See [MOBILE_APP.md](./MOBILE_APP.md) for detailed instructions.
+
 ## 🚀 Features
 
 - **Virtual Trading**: Create portfolios with ₹10,00,000 starting capital

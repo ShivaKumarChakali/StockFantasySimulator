@@ -1,0 +1,111 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Allow manual trigger
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  NODE_VERSION: '20.x'
+  JAVA_VERSION: '17'
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build:mobile
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Check if Android platform exists
+        id: check_android
+        run: |
+          if [ -d "android" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add Capacitor Android platform
+        if: steps.check_android.outputs.exists == 'false'
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build Debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Build Release APK (if keystore provided)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+        working-directory: android
+        continue-on-error: true
+        run: |
+          if [ -f "keystore.properties" ]; then
+            ./gradlew assembleRelease
+          else
+            echo "⚠️  No keystore.properties found, skipping release build"
+            echo "To build release APK, add keystore.properties as GitHub secret"
+          fi
+
+      - name: Upload Release APK artifact
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: app-release
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 90
+
+      - name: APK Build Summary
+        run: |
+          echo "## Android APK Build Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Debug APK built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Download:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Go to Actions tab → This workflow run → Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Download `app-debug` artifact" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+            echo "✅ Release APK built successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️  Release APK not built (keystore not configured)" >> $GITHUB_STEP_SUMMARY
+          fi
+
