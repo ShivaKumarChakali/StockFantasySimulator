@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { Clock, Zap, Loader2 } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 export default function Contests() {
   const [selectedContest, setSelectedContest] = useState<any>(null);

@@ -30,6 +30,12 @@ function getTodayMarketTimes(): { startDate: Date; endDate: Date } {
  * Seed contests and dummy data
  */
 export async function seedContests() {
+  // Skip in production - daily contest scheduler handles it
+  if (process.env.NODE_ENV === "production") {
+    console.log("ℹ️  Skipping seed in production - daily contest scheduler will handle contest creation");
+    return;
+  }
+  
   try {
     console.log("🌱 Seeding daily contests and dummy leaderboard data...");
 
@@ -112,15 +118,25 @@ export async function seedContests() {
     }
 
     // Verify contests exist in database before proceeding
-    const verifyContest1 = await storage.getContest(contest1.id);
-    const verifyContest2 = await storage.getContest(contest2.id);
+    // Add a small delay for eventual consistency in distributed databases
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    let verifyContest1 = await storage.getContest(contest1.id);
+    let verifyContest2 = await storage.getContest(contest2.id);
+    
+    // Retry once if not found (for eventual consistency)
+    if (!verifyContest1 || !verifyContest2) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      verifyContest1 = await storage.getContest(contest1.id);
+      verifyContest2 = await storage.getContest(contest2.id);
+    }
     
     if (!verifyContest1) {
-      console.error(`❌ Contest 1 (${contest1.id}) not found in database after creation`);
+      console.error(`❌ Contest 1 (${contest1.id}) not found in database after creation and retry`);
       return;
     }
     if (!verifyContest2) {
-      console.error(`❌ Contest 2 (${contest2.id}) not found in database after creation`);
+      console.error(`❌ Contest 2 (${contest2.id}) not found in database after creation and retry`);
       return;
     }
 
@@ -252,8 +268,12 @@ export async function seedContests() {
   }
 }
 
-// Run if called directly
+// Run if called directly (only in development)
 if (import.meta.url === `file://${process.argv[1]}`) {
+  if (process.env.NODE_ENV === "production") {
+    console.log("ℹ️  Skipping seed in production - use daily contest scheduler instead");
+    process.exit(0);
+  }
   seedContests()
     .then(() => {
       console.log("Done!");

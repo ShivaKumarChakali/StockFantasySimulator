@@ -120,7 +120,24 @@ async function createDailyContestsForDate(date: Date): Promise<void> {
     status: "upcoming", // Allow joining before start
   });
 
-  console.log(`✅ Created contests: ${contest1.name}, ${contest2.name}`);
+  // Verify contests were created successfully
+  const verify1 = await storage.getContest(contest1.id);
+  const verify2 = await storage.getContest(contest2.id);
+  
+  if (!verify1 || !verify2) {
+    console.warn(`⚠️  Contests created but verification failed. Retrying...`);
+    // Wait a bit and retry verification (for eventual consistency)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const retry1 = await storage.getContest(contest1.id);
+    const retry2 = await storage.getContest(contest2.id);
+    
+    if (!retry1 || !retry2) {
+      console.error(`❌ Failed to verify contests after creation. Contest 1: ${retry1 ? 'OK' : 'MISSING'}, Contest 2: ${retry2 ? 'OK' : 'MISSING'}`);
+      throw new Error("Contest creation verification failed");
+    }
+  }
+
+  console.log(`✅ Created and verified contests: ${contest1.name}, ${contest2.name}`);
 }
 
 /**
