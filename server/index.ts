@@ -77,76 +77,134 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database with default data if using PostgreSQL
-  if (process.env.DATABASE_URL) {
-    try {
-      await initializeDatabase();
-    } catch (error) {
-      log("⚠️  Database initialization failed (this is okay if tables don't exist yet):");
-      log(String(error));
-    }
-  }
-
-  const server = await registerRoutes(app);
-
-  // Initialize and start daily contest scheduler
-  if (process.env.NODE_ENV !== "test") {
-    try {
-      await initializeDailyContests();
-      startDailyContestScheduler();
-    } catch (error) {
-      console.error("Failed to initialize daily contests:", error);
-      // Continue anyway - server should still work
-    }
-  }
-
-  // Start price updater service
-  if (process.env.NODE_ENV !== "test") {
-    try {
-      startPriceUpdater();
-    } catch (error) {
-      console.error("Failed to start price updater:", error);
-      // Continue anyway - server should still work
-    }
-  }
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    console.error("Error:", err);
-    res.status(status).json({ message });
-    // Don't throw - error already handled
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 8081 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '8081', 10);
-  server.listen(port, "0.0.0.0", () => {
-    log(`✅ Server listening on port ${port}`);
-  });
-
-  server.on('error', (error: any) => {
-    if (error.code === 'EADDRINUSE') {
-      log(`❌ Port ${port} is already in use`);
+  try {
+    console.log("🚀 Starting server initialization...");
+    
+    // Initialize database with default data if using PostgreSQL
+    if (process.env.DATABASE_URL) {
+      try {
+        console.log("📦 Initializing database...");
+        await initializeDatabase();
+        console.log("✅ Database initialization complete");
+      } catch (error) {
+        console.log("⚠️  Database initialization failed (this is okay if tables don't exist yet):");
+        console.log(String(error));
+      }
     } else {
-      log(`❌ Server error: ${error.message}`);
+      console.log("ℹ️  No DATABASE_URL, skipping database initialization");
     }
-    process.exit(1);
-  });
+
+    console.log("🛣️  Registering routes...");
+    let server;
+    try {
+      server = await registerRoutes(app);
+      console.log("✅ Routes registered, HTTP server created");
+    } catch (error) {
+      console.error("❌ Failed to register routes:", error);
+      if (error instanceof Error) {
+        console.error("Error stack:", error.stack);
+      }
+      throw error;
+    }
+
+    // Initialize and start daily contest scheduler
+    if (process.env.NODE_ENV !== "test") {
+      try {
+        console.log("📅 Initializing daily contests...");
+        await initializeDailyContests();
+        console.log("✅ Daily contests initialized");
+        startDailyContestScheduler();
+        console.log("✅ Daily contest scheduler started");
+      } catch (error) {
+        console.error("❌ Failed to initialize daily contests:", error);
+        // Continue anyway - server should still work
+      }
+    }
+
+    // Start price updater service
+    if (process.env.NODE_ENV !== "test") {
+      try {
+        console.log("💰 Starting price updater...");
+        startPriceUpdater();
+        console.log("✅ Price updater started");
+      } catch (error) {
+        console.error("❌ Failed to start price updater:", error);
+        // Continue anyway - server should still work
+      }
+    }
+
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+
+      console.error("Error:", err);
+      res.status(status).json({ message });
+      // Don't throw - error already handled
+    });
+
+    // importantly only setup vite in development and after
+    // setting up all the other routes so the catch-all route
+    // doesn't interfere with the other routes
+    if (app.get("env") === "development") {
+      console.log("🔧 Setting up Vite dev server...");
+      try {
+        await setupVite(app, server);
+        console.log("✅ Vite dev server setup complete");
+      } catch (error) {
+        console.error("❌ Failed to setup Vite:", error);
+        throw error;
+      }
+    } else {
+      console.log("📁 Setting up static file serving...");
+      try {
+        serveStatic(app);
+        console.log("✅ Static file serving setup complete");
+      } catch (error) {
+        console.error("❌ Failed to setup static file serving:", error);
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+        }
+        throw error;
+      }
+    }
+
+    // ALWAYS serve the app on the port specified in the environment variable PORT
+    // Other ports are firewalled. Default to 8081 if not specified.
+    // this serves both the API and the client.
+    // It is the only port that is not firewalled.
+    const port = parseInt(process.env.PORT || '8081', 10);
+    console.log(`🌐 Starting server on port ${port}...`);
+    
+    server.listen(port, "0.0.0.0", () => {
+      console.log(`✅ Server listening on port ${port}`);
+      log(`✅ Server listening on port ${port}`);
+    });
+
+    server.on('error', (error: any) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${port} is already in use`);
+        log(`❌ Port ${port} is already in use`);
+      } else {
+        console.error(`❌ Server error: ${error.message}`);
+        log(`❌ Server error: ${error.message}`);
+      }
+      process.exit(1);
+    });
+
+    console.log("✅ Server initialization complete - server should be running");
+  } catch (error) {
+    console.error("❌ Error during server initialization:", error);
+    if (error instanceof Error) {
+      console.error("Error stack:", error.stack);
+    }
+    throw error; // Re-throw to be caught by outer catch
+  }
 })().catch((error) => {
   console.error("❌ Fatal error during server startup:", error);
+  if (error instanceof Error) {
+    console.error("Error stack:", error.stack);
+  }
   process.exit(1);
 });
 
