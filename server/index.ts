@@ -205,7 +205,8 @@ app.use((req, res, next) => {
   if (error instanceof Error) {
     console.error("Error stack:", error.stack);
   }
-  process.exit(1);
+  // Don't exit here in Render - let errors be visible in logs
+  // The process will stay alive so we can see what went wrong
 });
 
 // Handle unhandled promise rejections
@@ -217,5 +218,8 @@ process.on('unhandledRejection', (reason, promise) => {
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
-  process.exit(1);
+  if (error instanceof Error) {
+    console.error('Error stack:', error.stack);
+  }
+  // Don't exit here on Render - log and let the process stay alive to see errors
 });
