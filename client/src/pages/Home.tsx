@@ -76,13 +76,13 @@ export default function Home() {
             <img 
               src="/logo.png" 
               alt="StockFantasy Logo" 
-              className="h-12 w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 rounded-lg object-contain flex-shrink-0"
+              className="h-12 w-12 md:h-20 md:w-20 lg:h-24 lg:w-24 xl:h-28 xl:w-28 rounded-lg object-contain flex-shrink-0"
             />
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg md:text-xl lg:text-2xl font-bold mb-1 truncate">
+              <h1 className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 truncate">
                 Welcome back, {userData?.username || user?.displayName || user?.email?.split("@")[0] || "Trader"}! 👋
               </h1>
-              <p className="text-xs md:text-sm text-muted-foreground">Ready to dominate the market?</p>
+              <p className="text-xs md:text-base lg:text-lg xl:text-xl text-muted-foreground">Ready to dominate the market?</p>
             </div>
           </div>
         </div>
@@ -94,9 +94,9 @@ export default function Home() {
               <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-bold text-primary">🪙</span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium">Coins</span>
+              <span className="text-xs md:text-sm lg:text-base text-muted-foreground font-medium">Coins</span>
             </div>
-            <p className="text-lg md:text-xl font-bold tabular-nums">
+            <p className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold tabular-nums">
               {userData?.virtualBalance?.toLocaleString() || "0"}
             </p>
           </Card>
@@ -106,17 +106,17 @@ export default function Home() {
               <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-bold text-primary">⭐</span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium">Level</span>
+              <span className="text-xs md:text-sm lg:text-base text-muted-foreground font-medium">Level</span>
             </div>
-            <p className="text-lg md:text-xl font-bold">1</p>
+            <p className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold">1</p>
           </Card>
         </div>
 
         {/* XP Progress */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-muted-foreground font-medium">XP Progress</span>
-            <span className="text-xs text-muted-foreground">0 / 100 XP</span>
+            <span className="text-xs md:text-sm lg:text-base text-muted-foreground font-medium">XP Progress</span>
+            <span className="text-xs md:text-sm lg:text-base text-muted-foreground">0 / 100 XP</span>
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div className="h-full w-0 bg-primary rounded-full" />
@@ -131,14 +131,14 @@ export default function Home() {
           <div className="flex items-center justify-between mb-3 md:mb-4">
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
-              <h2 className="text-base md:text-lg font-semibold">Your Active Contests</h2>
+              <h2 className="text-base md:text-xl lg:text-2xl xl:text-3xl font-semibold">Your Active Contests</h2>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/contests")}
               data-testid="link-view-all-contests"
-              className="text-xs md:text-sm"
+              className="text-xs md:text-base lg:text-lg"
             >
               View All →
             </Button>
@@ -150,7 +150,7 @@ export default function Home() {
         {/* Quick Actions */}
         <div>
           <div className="flex items-center gap-2 mb-3 md:mb-4">
-            <span className="text-base md:text-lg font-semibold">⚡ Quick Actions</span>
+            <span className="text-base md:text-xl lg:text-2xl xl:text-3xl font-semibold">⚡ Quick Actions</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 md:gap-3">
@@ -161,7 +161,7 @@ export default function Home() {
               data-testid="button-browse-stocks"
             >
               <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
-              <span className="text-xs">Browse & Portfolio</span>
+              <span className="text-xs md:text-sm lg:text-base">Browse & Portfolio</span>
             </Button>
 
             <Button
@@ -181,7 +181,7 @@ export default function Home() {
               data-testid="button-portfolio-nav"
             >
               <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
-              <span className="text-xs">Portfolio</span>
+              <span className="text-xs md:text-sm lg:text-base">Portfolio</span>
             </Button>
 
             <Button
@@ -190,8 +190,8 @@ export default function Home() {
               onClick={() => setLocation("/leaderboard")}
               data-testid="button-leaderboard-nav"
             >
-              <Users className="w-5 h-5 md:w-6 md:h-6" />
-              <span className="text-xs">Leaderboard</span>
+              <Users className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+              <span className="text-xs md:text-sm lg:text-base">Leaderboard</span>
             </Button>
           </div>
         </div>
@@ -201,14 +201,14 @@ export default function Home() {
           <div className="flex items-center justify-between mb-3 md:mb-4">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
-              <h2 className="text-base md:text-lg font-semibold">Trending Stocks</h2>
+              <h2 className="text-base md:text-xl lg:text-2xl xl:text-3xl font-semibold">Trending Stocks</h2>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/market")}
               data-testid="link-view-all-stocks"
-              className="text-xs md:text-sm"
+              className="text-xs md:text-base lg:text-lg"
             >
               View All →
             </Button>
@@ -228,12 +228,12 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm md:text-base truncate">{stock.symbol}</p>
-                      <p className="text-xs text-muted-foreground truncate">{stock.companyName}</p>
+                      <p className="font-semibold text-sm md:text-lg lg:text-xl truncate">{stock.symbol}</p>
+                      <p className="text-xs md:text-sm lg:text-base text-muted-foreground truncate">{stock.companyName}</p>
                     </div>
                     <div className="text-right flex-shrink-0 ml-2">
-                      <p className="font-semibold text-sm md:text-base tabular-nums">₹{stock.currentPrice.toFixed(2)}</p>
-                      <p className={`text-xs ${stock.priceChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                      <p className="font-semibold text-sm md:text-lg lg:text-xl tabular-nums">₹{stock.currentPrice.toFixed(2)}</p>
+                      <p className={`text-xs md:text-sm lg:text-base ${stock.priceChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {stock.priceChange >= 0 ? '+' : ''}{stock.priceChangePercent.toFixed(2)}%
                       </p>
                     </div>
@@ -246,10 +246,10 @@ export default function Home() {
 
         {/* Footer */}
         <div className="text-center py-3 md:py-4">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs md:text-sm lg:text-base text-muted-foreground">
             © 2024 TRADE UP. Fantasy trading for educational purposes.
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs md:text-sm lg:text-base text-muted-foreground mt-1">
             Not real money. Not real stocks. Real learning.
           </p>
         </div>

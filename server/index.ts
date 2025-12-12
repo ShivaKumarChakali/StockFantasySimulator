@@ -4,6 +4,7 @@ import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import cors from "cors";
+import pgSession from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./init-db";
@@ -32,13 +33,39 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Session configuration
+// Use PostgreSQL session store if DATABASE_URL is available, otherwise use memory store
+let sessionStore: session.Store | undefined;
+
+if (process.env.DATABASE_URL) {
+  try {
+    const PgSession = pgSession(session);
+    sessionStore = new PgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: "session", // Table name for sessions
+      createTableIfMissing: true, // Automatically create the session table if it doesn't exist
+    });
+    console.log("✅ Using PostgreSQL session store");
+  } catch (error) {
+    console.warn("⚠️  Failed to initialize PostgreSQL session store, using memory store:", error);
+    sessionStore = undefined;
+  }
+} else {
+  console.log("ℹ️  No DATABASE_URL, using memory session store (sessions will be lost on restart)");
+}
+
+// Trust proxy for secure cookies behind Render's load balancer
+if (process.env.NODE_ENV === "production") {
+  app.set('trust proxy', 1);
+}
+
 app.use(
   session({
+    store: sessionStore,
     secret: process.env.SESSION_SECRET || "stock-fantasy-simulator-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production", // Will be true behind HTTPS proxy
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       sameSite: "lax",

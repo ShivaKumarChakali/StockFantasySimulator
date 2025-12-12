@@ -70,8 +70,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set session
       (req.session as any).userId = user.id;
       (req.session as any).firebaseUid = firebaseUid;
-
-      res.json(user);
+      
+      // Save session to ensure it's persisted
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+        }
+        res.json(user);
+      });
     } catch (error) {
       console.error("Firebase auth error:", error);
       res.status(400).json({ error: "Authentication failed" });
@@ -93,8 +99,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Check if user already exists
         const existingUser = await storage.getUserByFirebaseUid(firebaseUid);
         if (existingUser) {
-          (req.session as any).userId = existingUser.id;
+        (req.session as any).userId = existingUser.id;
+        req.session.save((err) => {
+          if (err) {
+            console.error("Error saving session:", err);
+          }
           return res.json(existingUser);
+        });
+        return;
         }
 
         // Check username uniqueness
@@ -113,8 +125,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         (req.session as any).userId = user.id;
         (req.session as any).firebaseUid = firebaseUid;
-
-        return res.json(user);
+        
+        req.session.save((err) => {
+          if (err) {
+            console.error("Error saving session:", err);
+          }
+          return res.json(user);
+        });
+        return;
       }
 
       // Legacy signup (without Firebase)
@@ -125,7 +143,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const user = await storage.createUser(parsed);
       (req.session as any).userId = user.id;
-      res.json(user);
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+        }
+        res.json(user);
+      });
     } catch (error) {
       console.error("Signup error:", error);
       res.status(400).json({ error: "Invalid request" });
@@ -150,7 +173,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         (req.session as any).userId = user.id;
         (req.session as any).firebaseUid = decoded.uid;
-        return res.json(user);
+        req.session.save((err) => {
+          if (err) {
+            console.error("Error saving session:", err);
+          }
+          res.json(user);
+        });
+        return;
       }
 
       // Legacy username/password login
@@ -164,7 +193,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       (req.session as any).userId = user.id;
-      res.json(user);
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+        }
+        res.json(user);
+      });
     } catch (error) {
       console.error("Login error:", error);
       res.status(400).json({ error: "Invalid request" });
