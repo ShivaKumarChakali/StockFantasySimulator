@@ -21,3 +21,4 @@ services:
       - key: CORS_ORIGIN
         sync: false # Set to your Render URL, e.g., https://stock-fantasy-simulator.onrender.com
 
+

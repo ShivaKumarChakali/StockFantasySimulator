@@ -180,3 +180,4 @@ This is required for your Render server to authenticate users and verify Firebas
 
 **That's it!** Your server will now be able to authenticate with Firebase.
 
+

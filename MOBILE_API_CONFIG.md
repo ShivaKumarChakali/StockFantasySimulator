@@ -173,3 +173,4 @@ console.log("Stocks URL:", apiUrl("/api/stocks"));
 - [ ] Tested API connectivity from mobile device
 - [ ] Rebuilt APK with correct configuration
 
+
