@@ -269,7 +269,17 @@ export async function seedContests() {
 }
 
 // Run if called directly (only in development)
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Only execute if this file is explicitly run as a script (not when imported/bundled)
+// When bundled, import.meta.url will be different, so this check should be safe
+// But to be extra safe, we'll check if the main entry point is this specific file
+const mainScript = process.argv[1];
+const isRunDirectly = mainScript && (
+  mainScript.includes('seed-contests') && 
+  !mainScript.includes('dist/index.js') &&
+  !mainScript.includes('server/index.ts')
+);
+
+if (isRunDirectly) {
   if (process.env.NODE_ENV === "production") {
     console.log("ℹ️  Skipping seed in production - use daily contest scheduler instead");
     process.exit(0);
