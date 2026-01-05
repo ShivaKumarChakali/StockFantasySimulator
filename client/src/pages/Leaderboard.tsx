@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { LeaderboardEntry, type LeaderboardUser } from "@/components/LeaderboardEntry";
+import { LegalDisclaimerInline } from "@/components/LegalDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -51,29 +52,51 @@ export default function Leaderboard() {
   const { data: globalLeaderboard = [], isLoading: globalLoading } = useQuery({
     queryKey: ["/api/leaderboard/global"],
     queryFn: async () => {
-      // For now, get leaderboard from all contests
-      // In production, you'd have a global leaderboard endpoint
-      const allContests = await fetch("/api/contests", { credentials: "include" }).then((r) => r.json());
-      const allEntries: any[] = [];
-      
-      for (const contest of allContests) {
-        const leaderboard = await fetch(`/api/leaderboard/contest/${contest.id}`, {
-          credentials: "include",
-        }).then((r) => r.json());
-        allEntries.push(...leaderboard);
+      try {
+        // For now, get leaderboard from all contests
+        // In production, you'd have a global leaderboard endpoint
+        const allContests = await fetch("/api/contests", { credentials: "include" }).then((r) => {
+          if (!r.ok) throw new Error("Failed to fetch contests");
+          return r.json();
+        });
+        const allEntries: any[] = [];
+        
+        for (const contest of allContests) {
+          try {
+            const response = await fetch(`/api/leaderboard/contest/${contest.id}`, {
+              credentials: "include",
+            });
+            if (!response.ok) {
+              console.warn(`Failed to fetch leaderboard for contest ${contest.id}`);
+              continue;
+            }
+            const leaderboard = await response.json();
+            allEntries.push(...leaderboard);
+          } catch (error) {
+            console.warn(`Error fetching leaderboard for contest ${contest.id}:`, error);
+            continue;
+          }
+        }
+        
+        // Sort by ROI and add ranks
+        return allEntries
+          .sort((a, b) => {
+            const aRoi = a.finalRoi ?? a.roi ?? 0;
+            const bRoi = b.finalRoi ?? b.roi ?? 0;
+            return bRoi - aRoi;
+          })
+          .slice(0, 100)
+          .map((entry, index) => ({
+            rank: index + 1,
+            userId: entry.userId,
+            username: entry.user?.username || "Unknown",
+            portfolioValue: entry.portfolio?.totalValue || 0,
+            roi: entry.finalRoi ?? entry.roi ?? 0,
+          }));
+      } catch (error) {
+        console.error("Error fetching global leaderboard:", error);
+        return [];
       }
-      
-      // Sort by ROI and add ranks
-      return allEntries
-        .sort((a, b) => (b.finalRoi || b.roi || 0) - (a.finalRoi || a.roi || 0))
-        .slice(0, 100)
-        .map((entry, index) => ({
-          rank: index + 1,
-          userId: entry.userId,
-          username: entry.user?.username || "Unknown",
-          portfolioValue: entry.portfolio?.totalValue || 0,
-          roi: entry.finalRoi || entry.roi || 0,
-        }));
     },
     enabled: activeTab === "global",
     refetchOnWindowFocus: false,
@@ -87,19 +110,27 @@ export default function Leaderboard() {
     queryKey: selectedCollege ? ["/api/leaderboard/college", selectedCollege, selectedContest] : [],
     queryFn: async () => {
       if (!selectedCollege) return [];
-      const url = selectedContest
-        ? `/api/leaderboard/college/${selectedCollege}?contestId=${selectedContest}`
-        : `/api/leaderboard/college/${selectedCollege}`;
-      const response = await fetch(url, { credentials: "include" });
-      if (!response.ok) return [];
-      const data = await response.json();
-      return data.map((entry: any, index: number) => ({
-        rank: index + 1,
-        userId: entry.userId,
-        username: entry.user?.username || "Unknown",
-        portfolioValue: entry.portfolio?.totalValue || 0,
-        roi: entry.finalRoi || entry.roi || 0,
-      }));
+      try {
+        const url = selectedContest
+          ? `/api/leaderboard/college/${selectedCollege}?contestId=${selectedContest}`
+          : `/api/leaderboard/college/${selectedCollege}`;
+        const response = await fetch(url, { credentials: "include" });
+        if (!response.ok) {
+          console.warn(`Failed to fetch college leaderboard: ${response.status}`);
+          return [];
+        }
+        const data = await response.json();
+        return data.map((entry: any, index: number) => ({
+          rank: index + 1,
+          userId: entry.userId,
+          username: entry.user?.username || "Unknown",
+          portfolioValue: entry.portfolio?.totalValue || 0,
+          roi: entry.finalRoi ?? entry.roi ?? 0,
+        }));
+      } catch (error) {
+        console.error("Error fetching college leaderboard:", error);
+        return [];
+      }
     },
     enabled: activeTab === "college" && !!selectedCollege,
     refetchOnWindowFocus: false,
@@ -129,9 +160,12 @@ export default function Leaderboard() {
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 md:p-6 border-b border-border bg-card">
         <div className="flex items-center justify-between mb-3 md:mb-4">
-          <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary flex-shrink-0" />
-            <h1 className="text-xl md:text-2xl font-bold">Leaderboard</h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <Trophy className="h-5 w-5 md:h-6 md:w-6 text-primary flex-shrink-0" />
+              <h1 className="text-xl md:text-2xl font-bold">Learning Leaderboard</h1>
+            </div>
+            <LegalDisclaimerInline />
           </div>
         </div>
 

@@ -103,9 +103,9 @@ export default function Profile() {
     : null;
 
   const stats = [
-    { label: "Contests Played", value: contestsPlayed.toString(), icon: <Trophy className="h-4 w-4" /> },
-    { label: "Win Rate", value: contestsPlayed > 0 ? "—" : "—", icon: <Target className="h-4 w-4" /> },
-    { label: "Total ROI", value: `${totalROI >= 0 ? "+" : ""}${totalROI.toFixed(1)}%`, icon: <TrendingUp className="h-4 w-4" /> },
+    { label: "Contests Practiced", value: contestsPlayed.toString(), icon: <Trophy className="h-4 w-4" /> },
+    { label: "Performance Rate", value: contestsPlayed > 0 ? "—" : "—", icon: <Target className="h-4 w-4" /> },
+    { label: "Total Performance", value: `${totalROI >= 0 ? "+" : ""}${totalROI.toFixed(1)}%`, icon: <TrendingUp className="h-4 w-4" /> },
     { label: "Best Rank", value: bestRank ? `${bestRank}${bestRank === 1 ? "st" : bestRank === 2 ? "nd" : bestRank === 3 ? "rd" : "th"}` : "—", icon: <Award className="h-4 w-4" /> },
   ];
 

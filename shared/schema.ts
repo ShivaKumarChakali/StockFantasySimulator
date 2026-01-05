@@ -47,7 +47,7 @@ export const contests = pgTable("contests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   description: text("description"),
-  entryFee: real("entry_fee").notNull(),
+  // Note: entryFee removed - this is an educational platform, contests are free to join
   startingCapital: real("starting_capital").default(1000000),
   duration: integer("duration").notNull(),
   startDate: timestamp("start_date").notNull(),

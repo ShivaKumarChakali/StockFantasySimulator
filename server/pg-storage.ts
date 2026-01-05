@@ -114,11 +114,11 @@ export class PostgresStorage implements IStorage {
     return result[0];
   }
 
-  async createContest(contest: Omit<Contest, 'id' | 'createdAt'>): Promise<Contest> {
+  async createContest(contest: Omit<Contest, 'id' | 'createdAt' | 'entryFee'>): Promise<Contest> {
     const [newContest] = await this.getDb().insert(contests).values({
       name: contest.name,
       description: contest.description || null,
-      entryFee: contest.entryFee,
+      // entryFee removed - educational platform, contests are free to join
       startingCapital: contest.startingCapital || 1000000,
       duration: contest.duration,
       startDate: contest.startDate,
@@ -273,13 +273,24 @@ export class PostgresStorage implements IStorage {
       })
       .from(userContests)
       .innerJoin(users, eq(userContests.userId, users.id))
-      .where(and(...conditions))
-      .orderBy(desc(userContests.finalRoi));
+      .where(and(...conditions));
 
-    return results.map((r) => ({
-      ...r.userContest,
-      user: r.user,
-    }));
+    // Enrich with portfolio ROI for live contests (similar to getContestLeaderboard)
+    const enriched = await Promise.all(
+      results.map(async (r) => {
+        const uc = r.userContest;
+        if (uc.portfolioId) {
+          const portfolio = await this.getPortfolio(uc.portfolioId);
+          // Use portfolio ROI if finalRoi is not set (live contest)
+          const roi = uc.finalRoi !== null && uc.finalRoi !== undefined ? uc.finalRoi : (portfolio?.roi || 0);
+          return { ...uc, user: r.user, roi } as UserContest & { user: User; roi: number };
+        }
+        return { ...uc, user: r.user, roi: uc.finalRoi || 0 } as UserContest & { user: User; roi: number };
+      })
+    );
+
+    // Sort by ROI (finalRoi for ended contests, portfolio.roi for live)
+    return enriched.sort((a, b) => (b.roi || 0) - (a.roi || 0));
   }
 
   async updateUserContestFinalRoi(userContestId: string, finalRoi: number): Promise<void> {

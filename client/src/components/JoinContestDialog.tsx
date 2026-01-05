@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +14,7 @@ interface JoinContestDialogProps {
   contest: {
     id: string;
     name: string;
-    entryFee: number;
+    // Note: entryFee removed - educational platform, contests are free to join
     startingCapital: number;
     status?: "upcoming" | "live" | "ended";
   };
@@ -22,9 +22,17 @@ interface JoinContestDialogProps {
 
 export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDialogProps) {
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const { isAuthenticated, user } = useAuth();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
+
+  // Clear error when dialog opens
+  useEffect(() => {
+    if (open) {
+      setErrorMessage("");
+    }
+  }, [open]);
 
   // Fetch user's portfolios
   const { data: portfolios = [], isLoading: portfoliosLoading } = useQuery<Array<{
@@ -70,6 +78,7 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
 
   const joinContestMutation = useMutation({
     mutationFn: async ({ contestId, portfolioId }: { contestId: string; portfolioId: string }) => {
+      setErrorMessage(""); // Clear previous errors
       const response = await fetch(apiUrl(`/api/contests/${contestId}/join`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,7 +87,7 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: "Failed to join contest" }));
         throw new Error(error.error || "Failed to join contest");
       }
 
@@ -89,6 +98,9 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
       queryClient.invalidateQueries({ queryKey: ["/api/contests"] });
       queryClient.invalidateQueries({ queryKey: ["/api/users", user?.uid] });
       onOpenChange(false);
+    },
+    onError: (error: Error) => {
+      setErrorMessage(error.message || "Failed to join contest. Please try again.");
     },
   });
 
@@ -109,18 +121,13 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
       return;
     }
 
-    if (userData && userData.virtualBalance < contest.entryFee) {
-      alert(`Insufficient balance. You need ${contest.entryFee.toLocaleString()} coins but have ${userData.virtualBalance.toLocaleString()} coins`);
-      return;
-    }
-
+    // Note: Entry fee check removed - educational platform, contests are free to join
     joinContestMutation.mutate({
       contestId: contest.id,
       portfolioId: selectedPortfolioId,
     });
   };
 
-  const hasEnoughBalance = userData && userData.virtualBalance >= contest.entryFee;
   const hasPortfolios = portfolios.length > 0;
 
   return (
@@ -129,11 +136,17 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
         <DialogHeader>
           <DialogTitle className="text-lg md:text-xl">Join {contest.name}</DialogTitle>
           <DialogDescription className="text-xs md:text-sm">
-            Select a portfolio to enter this contest. Entry fee: {contest.entryFee.toLocaleString()} coins
+            Select a portfolio to join this educational simulation contest. Free to join.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 md:space-y-4 py-3 md:py-4">
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
           {contest.status === "ended" ? (
             <Alert>
               <AlertCircle className="h-4 w-4" />
@@ -164,17 +177,7 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
             </Alert>
           ) : (
             <>
-              {userData && (
-                <div className="p-3 md:p-4 bg-muted rounded-lg">
-                  <div className="text-xs md:text-sm text-muted-foreground">Your Balance</div>
-                  <div className="text-base md:text-lg font-bold tabular-nums">{userData.virtualBalance.toLocaleString()} coins</div>
-                  {!hasEnoughBalance && (
-                    <div className="text-xs md:text-sm text-destructive mt-1">
-                      Insufficient balance. Need {contest.entryFee.toLocaleString()} coins
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Note: Balance display removed - no entry fee for educational contests */}
 
               <div>
                 <label className="text-xs md:text-sm font-medium mb-2 block">Select Portfolio</label>
@@ -200,12 +203,11 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
 
               <div className="p-3 md:p-4 bg-muted rounded-lg space-y-1.5 md:space-y-2">
                 <div className="flex justify-between text-xs md:text-sm">
-                  <span>Entry Fee:</span>
-                  <span className="font-semibold tabular-nums">{contest.entryFee.toLocaleString()} coins</span>
-                </div>
-                <div className="flex justify-between text-xs md:text-sm">
                   <span>Starting Capital:</span>
                   <span className="font-semibold tabular-nums">₹{contest.startingCapital.toLocaleString()}</span>
+                </div>
+                <div className="text-xs text-muted-foreground italic pt-1">
+                  Educational simulation - Free to join
                 </div>
               </div>
             </>
@@ -228,7 +230,6 @@ export function JoinContestDialog({ open, onOpenChange, contest }: JoinContestDi
               !isAuthenticated ||
               !hasPortfolios ||
               !selectedPortfolioId ||
-              !hasEnoughBalance ||
               contest.status === "ended"
             }
             className="w-full sm:w-auto min-h-[44px]"

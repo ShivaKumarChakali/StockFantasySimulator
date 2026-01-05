@@ -1,6 +1,7 @@
 import { ContestCard, type Contest } from "@/components/ContestCard";
 import { CoinBalance } from "@/components/CoinBalance";
 import { JoinContestDialog } from "@/components/JoinContestDialog";
+import { LegalDisclaimerInline } from "@/components/LegalDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -19,8 +20,7 @@ export default function Contests() {
   const { data: contests = [], isLoading } = useQuery<Array<{
     id: string;
     name: string;
-    entryFee: number;
-    prizePool?: number;
+    // Note: entryFee and prizePool removed - educational platform, contests are free
     participants?: number;
     timeRemaining?: string;
     festMode?: boolean;
@@ -116,8 +116,7 @@ export default function Contests() {
   const transformedContests: Contest[] = filteredContests.map((contest: any) => ({
     id: contest.id,
     name: contest.name,
-    entryFee: contest.entryFee,
-    prizePool: contest.prizePool || contest.entryFee * (contest.participants || 0),
+    // Note: entryFee and prizePool removed - educational platform, contests are free
     participants: contest.participants || 0,
     maxParticipants: 10000, // No limit for now
     timeRemaining: contest.timeRemaining || "N/A",
@@ -131,7 +130,10 @@ export default function Contests() {
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 md:p-6 border-b border-border bg-card">
         <div className="flex items-center justify-between mb-3 md:mb-4 gap-2">
-          <h1 className="text-xl md:text-2xl font-bold">Contests</h1>
+          <div className="flex-1">
+            <h1 className="text-xl md:text-2xl font-bold">Learning Contests</h1>
+            <LegalDisclaimerInline className="mt-1" />
+          </div>
           <CoinBalance balance={userData?.virtualBalance || 0} />
         </div>
 

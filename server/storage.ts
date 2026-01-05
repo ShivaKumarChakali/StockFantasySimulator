@@ -24,7 +24,7 @@ export interface IStorage {
   // Contests
   getAllContests(): Promise<Contest[]>;
   getContest(id: string): Promise<Contest | undefined>;
-  createContest(contest: Omit<Contest, 'id' | 'createdAt'>): Promise<Contest>;
+  createContest(contest: Omit<Contest, 'id' | 'createdAt' | 'entryFee'>): Promise<Contest>;
   updateContestStatus(id: string, status: string): Promise<Contest | undefined>;
   getFestContests(): Promise<Contest[]>;
   
@@ -146,8 +146,9 @@ export class MemStorage implements IStorage {
     return this.contests.get(id);
   }
 
-  async createContest(contest: Omit<Contest, 'id' | 'createdAt'>): Promise<Contest> {
+  async createContest(contest: Omit<Contest, 'id' | 'createdAt' | 'entryFee'>): Promise<Contest> {
     const id = randomUUID();
+    // Note: entryFee removed - educational platform, contests are free to join
     const newContest: Contest = { ...contest, id, createdAt: new Date() } as Contest;
     this.contests.set(id, newContest);
     return newContest;

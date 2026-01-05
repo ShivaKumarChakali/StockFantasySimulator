@@ -70,8 +70,7 @@ export async function seedContests() {
       try {
       contest1 = await storage.createContest({
         name: "Daily Stock Challenge - Morning",
-        description: "Join the morning trading session! Show your skills and compete for the top spot.",
-        entryFee: 100,
+        description: "Join the morning trading session! Practice your skills and analyze market performance.",
         startingCapital: 1000000,
         duration: 1, // 1 day
         startDate,
@@ -95,8 +94,7 @@ export async function seedContests() {
     try {
       contest2 = await storage.createContest({
         name: "Daily Stock Challenge - Afternoon",
-        description: "Afternoon trading session. Make the best moves and climb the leaderboard!",
-        entryFee: 50,
+        description: "Afternoon trading session. Practice your strategies and track your learning progress!",
         startingCapital: 1000000,
         duration: 1,
         startDate,

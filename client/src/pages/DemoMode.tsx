@@ -62,7 +62,7 @@ export default function DemoMode() {
 
           <Card className="p-4 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
             <p className="text-sm">
-              This is a demo contest. Ready to compete for real? Create an account to join actual contests and compete with your college!
+              This is a demo simulation. Create an account to join learning contests and practice with your college!
             </p>
           </Card>
         </div>

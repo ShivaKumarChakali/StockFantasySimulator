@@ -14,14 +14,14 @@ export default function Landing() {
           <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/20 mb-3 md:mb-4">
             <TrendingUp className="w-8 h-8 md:w-10 md:h-10 text-primary" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Estocks</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Stock Learning Platform</h1>
           <p className="text-base md:text-lg text-muted-foreground">
-            India's First College Stock Simulation Game
+            Educational Stock Market Simulation for Learning
           </p>
         </div>
 
         <p className="text-sm md:text-base text-muted-foreground max-w-md mb-6 md:mb-8 px-4">
-          Just like Dream11, but for stock markets. Learn, compete, and dominate with virtual money. No real money risk. Just pure brain power.
+          Learn stock market fundamentals through hands-on simulation. Practice trading strategies, analyze market data, and develop your skills in a risk-free educational environment.
         </p>
 
         <div className="flex flex-col gap-2 md:gap-3 w-full max-w-sm mb-8 md:mb-12 px-4">
@@ -79,9 +79,9 @@ export default function Landing() {
                 <Trophy className="w-5 h-5 md:w-6 md:h-6 text-primary" />
               </div>
               <div className="text-left flex-1 min-w-0">
-                <h3 className="font-semibold text-sm md:text-base mb-1">Gamified Contests</h3>
+                <h3 className="font-semibold text-sm md:text-base mb-1">Learning Contests</h3>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Compete in daily/weekly sessions and climb the leaderboard
+                  Participate in daily simulation sessions and track your learning progress
                 </p>
               </div>
             </div>
@@ -95,7 +95,7 @@ export default function Landing() {
               <div className="text-left flex-1 min-w-0">
                 <h3 className="font-semibold text-sm md:text-base mb-1">College Competition</h3>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Compete with your college and become a campus champion
+                  Practice with your college and track your learning progress
                 </p>
               </div>
             </div>
@@ -107,9 +107,9 @@ export default function Landing() {
                 <Zap className="w-5 h-5 md:w-6 md:h-6 text-primary" />
               </div>
               <div className="text-left flex-1 min-w-0">
-                <h3 className="font-semibold text-sm md:text-base mb-1">Build Your Profile</h3>
+                <h3 className="font-semibold text-sm md:text-base mb-1">Track Your Progress</h3>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Earn certificates, badges, and recognition as you grow
+                  Monitor your learning journey and analyze your simulation performance
                 </p>
               </div>
             </div>
@@ -134,7 +134,7 @@ export default function Landing() {
 
           <Card className="p-4 md:p-6 text-center">
             <p className="text-2xl md:text-3xl font-bold text-primary mb-2">ROI%</p>
-            <p className="text-xs md:text-sm text-muted-foreground">Win by Returns</p>
+            <p className="text-xs md:text-sm text-muted-foreground">Performance by Returns</p>
           </Card>
 
           <Card className="p-4 md:p-6 text-center">
@@ -174,8 +174,8 @@ export default function Landing() {
               3
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm md:text-base">Compete & Win</h3>
-              <p className="text-xs md:text-sm text-muted-foreground">Compete and rank on the leaderboard</p>
+            <h3 className="font-semibold text-sm md:text-base">Practice & Learn</h3>
+            <p className="text-xs md:text-sm text-muted-foreground">Practice your skills and track your progress on the leaderboard</p>
             </div>
           </div>
         </div>
@@ -184,9 +184,12 @@ export default function Landing() {
       {/* CTA Section */}
       <div className="px-4 md:px-6 py-8 md:py-12 pb-24">
         <Card className="p-4 md:p-6 text-center bg-primary/5 border-primary/20">
-          <h3 className="text-base md:text-lg font-semibold mb-2">Ready to Start Trading?</h3>
+          <h3 className="text-base md:text-lg font-semibold mb-2">Ready to Start Learning?</h3>
           <p className="text-xs md:text-sm text-muted-foreground mb-4">
-            Join thousands of students competing in the ultimate stock trading challenge
+            Join thousands of students learning stock market fundamentals through simulation
+          </p>
+          <p className="text-xs text-muted-foreground mb-4 italic">
+            Educational simulation only. No real money or prizes involved.
           </p>
           <Button
             className="w-full min-h-[44px]"

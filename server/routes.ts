@@ -296,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             status,
             timeRemaining,
             closingSoon,
-            prizePool: contest.entryFee * participantCount, // Calculate prize pool
+            // Note: prizePool removed - this is an educational platform, no monetary prizes
           };
         })
       );
@@ -336,11 +336,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const user = await storage.getUser(entry.userId);
           const portfolio = entry.portfolioId ? await storage.getPortfolio(entry.portfolioId) : null;
           
+          // Calculate ROI: use finalRoi if set, otherwise use portfolio ROI, otherwise 0
+          const roi = (entry as any).roi ?? entry.finalRoi ?? portfolio?.roi ?? 0;
+          
           return {
             ...entry,
             rank: index + 1,
             user,
             portfolio,
+            roi, // Include ROI in response for easier frontend access
           };
         })
       );
@@ -362,10 +366,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         leaderboard.map(async (entry, index) => {
           const portfolio = entry.portfolioId ? await storage.getPortfolio(entry.portfolioId) : null;
           
+          // Calculate ROI: use roi from entry if set, otherwise use finalRoi, otherwise portfolio ROI, otherwise 0
+          const roi = (entry as any).roi ?? entry.finalRoi ?? portfolio?.roi ?? 0;
+          
           return {
             ...entry,
             rank: index + 1,
             portfolio,
+            roi, // Include ROI in response for easier frontend access
           };
         })
       );
@@ -473,14 +481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Already joined this contest" });
       }
 
-      // Check user balance
-      const user = await storage.getUser(userId);
-      if (!user || (user.virtualBalance || 0) < contest.entryFee) {
-        return res.status(400).json({ error: "Insufficient balance" });
-      }
-
-      // Deduct entry fee
-      await storage.updateUserBalance(userId, -contest.entryFee);
+      // Note: Entry fee and balance checks removed - this is an educational platform, contests are free to join
 
       // Join contest
       const userContest = await storage.joinContest(userId, req.params.contestId, portfolioId);
@@ -973,17 +974,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Prize distribution endpoint (admin/manual trigger)
-  app.post("/api/contests/distribute-prizes", async (req, res) => {
-    try {
-      const { checkAndDistributePrizes } = await import("./prize-distributor");
-      await checkAndDistributePrizes();
-      res.json({ success: true, message: "Prize distribution completed" });
-    } catch (error) {
-      console.error("Error distributing prizes:", error);
-      res.status(500).json({ error: "Failed to distribute prizes" });
-    }
-  });
+  // Note: Prize distribution endpoint removed - this is an educational platform only
+  // No monetary prizes or rewards are distributed to users
 
   const httpServer = createServer(app);
   

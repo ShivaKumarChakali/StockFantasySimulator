@@ -8,7 +8,6 @@ import { storage } from "./storage";
 import { calculatePortfolioROI, updateContestPortfolios } from "./portfolio-calculator";
 import { wsManager } from "./websocket";
 import { isMarketOpen, getNextMarketOpen, getMsUntilNextMarketOpen } from "./market-hours";
-import { checkAndDistributePrizes } from "./prize-distributor";
 import { checkAndCreateTomorrowContests } from "./daily-contest-scheduler";
 
 const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 minutes
@@ -37,17 +36,8 @@ export function startPriceUpdater() {
     checkMarketAndScheduleUpdates();
   }, 60 * 1000); // Check every minute
 
-  // Check for ended contests and distribute prizes every hour
-  setInterval(() => {
-    checkAndDistributePrizes().catch((error) => {
-      console.error("Error in periodic prize distribution:", error);
-    });
-  }, 60 * 60 * 1000); // Every hour
-
-  // Also check immediately on startup for any pending prizes
-  checkAndDistributePrizes().catch((error) => {
-    console.error("Error in initial prize distribution check:", error);
-  });
+  // Note: Prize distribution removed - this is an educational platform only
+  // No monetary prizes or rewards are distributed
 }
 
 /**
@@ -93,10 +83,7 @@ function checkMarketAndScheduleUpdates() {
       updateInterval = null;
     }
     
-    // Check for ended contests and distribute prizes when market closes
-    checkAndDistributePrizes().catch((error) => {
-      console.error("Error distributing prizes:", error);
-    });
+    // Note: Prize distribution removed - this is an educational platform only
     
     // Create tomorrow's contests when market closes
     checkAndCreateTomorrowContests().catch((error) => {

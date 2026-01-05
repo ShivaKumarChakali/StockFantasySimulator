@@ -95,11 +95,10 @@ async function createDailyContestsForDate(date: Date): Promise<void> {
   
   console.log(`📅 Creating daily contests for ${date.toDateString()}...`);
   
-  // Create 2 daily contests
+  // Create 2 daily contests (free to join - educational platform)
   const contest1 = await storage.createContest({
     name: `Daily Stock Challenge - Morning (${date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })})`,
-    description: "Join the morning trading session! Show your skills and compete for the top spot.",
-    entryFee: 100,
+    description: "Join the morning trading session! Practice your skills and analyze market performance.",
     startingCapital: 1000000,
     duration: 1, // 1 day
     startDate,
@@ -110,8 +109,7 @@ async function createDailyContestsForDate(date: Date): Promise<void> {
 
   const contest2 = await storage.createContest({
     name: `Daily Stock Challenge - Afternoon (${date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })})`,
-    description: "Afternoon trading session. Make the best moves and climb the leaderboard!",
-    entryFee: 50,
+    description: "Afternoon trading session. Practice your strategies and track your learning progress!",
     startingCapital: 1000000,
     duration: 1,
     startDate,

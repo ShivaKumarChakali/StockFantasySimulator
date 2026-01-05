@@ -6,8 +6,7 @@ import { Users, Clock, Trophy, Coins } from "lucide-react";
 export interface Contest {
   id: string;
   name: string;
-  entryFee: number;
-  prizePool: number;
+  // Note: entryFee and prizePool removed - this is an educational platform, contests are free to join
   participants: number;
   maxParticipants: number;
   timeRemaining: string;
@@ -64,26 +63,6 @@ export function ContestCard({ contest, onJoin }: ContestCardProps) {
 
         <div className="grid grid-cols-2 gap-2 md:gap-3">
           <div className="flex items-center gap-2">
-            <Coins className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <div className="text-xs text-muted-foreground">Entry</div>
-              <div className="text-sm font-bold tabular-nums" data-testid={`text-entry-fee-${contest.id}`}>
-                {contest.entryFee.toLocaleString()} coins
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <div className="text-xs text-muted-foreground">Prize Pool</div>
-              <div className="text-sm font-bold tabular-nums text-primary" data-testid={`text-prize-pool-${contest.id}`}>
-                {contest.prizePool.toLocaleString()} coins
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
             <div>
               <div className="text-xs text-muted-foreground">Participants</div>
@@ -102,6 +81,10 @@ export function ContestCard({ contest, onJoin }: ContestCardProps) {
               </div>
             </div>
           </div>
+        </div>
+        
+        <div className="text-xs text-muted-foreground italic pt-1">
+          Free to join - Educational simulation only
         </div>
 
         {contest.status === "ended" ? (

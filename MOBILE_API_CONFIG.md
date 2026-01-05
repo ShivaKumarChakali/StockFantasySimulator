@@ -174,3 +174,5 @@ console.log("Stocks URL:", apiUrl("/api/stocks"));
 - [ ] Rebuilt APK with correct configuration
 
 
+
+

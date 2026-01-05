@@ -39,12 +39,86 @@ let sessionStore: session.Store | undefined;
 if (process.env.DATABASE_URL) {
   try {
     const PgSession = pgSession(session);
-    sessionStore = new PgSession({
-      conString: process.env.DATABASE_URL,
+    
+    // Add connection timeout parameters to the connection string if not already present
+    let connectionString = process.env.DATABASE_URL;
+    if (!connectionString.includes('connect_timeout')) {
+      const separator = connectionString.includes('?') ? '&' : '?';
+      connectionString += `${separator}connect_timeout=10`;
+    }
+    
+    const pgStore = new PgSession({
+      conString: connectionString,
       tableName: "session", // Table name for sessions
       createTableIfMissing: true, // Automatically create the session table if it doesn't exist
+      // Prune expired sessions every 5 minutes
+      pruneSessionInterval: 300,
     });
-    console.log("✅ Using PostgreSQL session store");
+    
+    // Wrap the session store to handle connection errors gracefully
+    // This prevents the app from crashing when database is temporarily unavailable
+    // Use a Proxy to forward all methods to the underlying store, but wrap error-prone methods
+    sessionStore = new Proxy(pgStore, {
+      get(target, prop) {
+        // Wrap methods that can throw connection errors
+        if (prop === 'get') {
+          return (sid: string, callback: (err: any, session?: session.SessionData | null) => void) => {
+            target.get(sid, (err, session) => {
+              if (err && (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === 'ENETUNREACH')) {
+                console.warn(`[Session Store] Database connection error, returning null session: ${err.message}`);
+                callback(null, null);
+              } else {
+                callback(err, session);
+              }
+            });
+          };
+        }
+        if (prop === 'set') {
+          return (sid: string, session: session.SessionData, callback?: (err?: any) => void) => {
+            target.set(sid, session, (err) => {
+              if (err && (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === 'ENETUNREACH')) {
+                console.warn(`[Session Store] Database connection error during set, session not persisted: ${err.message}`);
+                if (callback) callback();
+              } else {
+                if (callback) callback(err);
+              }
+            });
+          };
+        }
+        if (prop === 'destroy') {
+          return (sid: string, callback?: (err?: any) => void) => {
+            target.destroy(sid, (err) => {
+              if (err && (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === 'ENETUNREACH')) {
+                console.warn(`[Session Store] Database connection error during destroy: ${err.message}`);
+                if (callback) callback();
+              } else {
+                if (callback) callback(err);
+              }
+            });
+          };
+        }
+        if (prop === 'touch') {
+          return (sid: string, session: session.SessionData, callback?: (err?: any) => void) => {
+            target.touch(sid, session, (err) => {
+              if (err && (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === 'ENETUNREACH')) {
+                console.warn(`[Session Store] Database connection error during touch: ${err.message}`);
+                if (callback) callback();
+              } else {
+                if (callback) callback(err);
+              }
+            });
+          };
+        }
+        // Forward all other properties/methods (including 'on', 'emit', etc.) to the original store
+        const value = (target as any)[prop];
+        if (typeof value === 'function') {
+          return value.bind(target);
+        }
+        return value;
+      }
+    }) as session.Store;
+    
+    console.log("✅ Using PostgreSQL session store (with error handling)");
   } catch (error) {
     console.warn("⚠️  Failed to initialize PostgreSQL session store, using memory store:", error);
     sessionStore = undefined;
@@ -72,6 +146,16 @@ app.use(
     },
   })
 );
+
+// Middleware to handle session store errors gracefully
+app.use((req, res, next) => {
+  // If session store fails, ensure req.session exists
+  if (!req.session) {
+    // Create a minimal session object if store fails
+    (req as any).session = {};
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   const start = Date.now();

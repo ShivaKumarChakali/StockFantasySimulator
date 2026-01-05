@@ -82,7 +82,7 @@ export default function Home() {
               <h1 className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 truncate">
                 Welcome back, {userData?.username || user?.displayName || user?.email?.split("@")[0] || "Trader"}! 👋
               </h1>
-              <p className="text-xs md:text-base lg:text-lg xl:text-xl text-muted-foreground">Ready to dominate the market?</p>
+              <p className="text-xs md:text-base lg:text-lg xl:text-xl text-muted-foreground">Ready to practice and learn?</p>
             </div>
           </div>
         </div>
@@ -245,12 +245,17 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <div className="text-center py-3 md:py-4">
-          <p className="text-xs md:text-sm lg:text-base text-muted-foreground">
-            © 2024 TRADE UP. Fantasy trading for educational purposes.
+        <div className="text-center py-3 md:py-4 border-t border-border/50 mt-6">
+          <p className="text-xs md:text-sm text-muted-foreground font-semibold mb-2">
+            Educational Disclaimer
           </p>
-          <p className="text-xs md:text-sm lg:text-base text-muted-foreground mt-1">
-            Not real money. Not real stocks. Real learning.
+          <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto px-4">
+            This platform is for educational and simulation purposes only. 
+            No real money trading, financial returns, or monetary prizes are involved. 
+            All trading activity is simulated using virtual currency for learning purposes.
+          </p>
+          <p className="text-xs md:text-sm text-muted-foreground mt-3">
+            © 2024 Stock Learning Platform. Educational simulation only.
           </p>
         </div>
       </div>
